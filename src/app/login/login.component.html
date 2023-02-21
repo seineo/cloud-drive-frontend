@@ -1,0 +1,36 @@
+<div class="login-wrapper">
+  <form class="login">
+    <section class="title">
+      <h3 class="welcome">Welcome to</h3>
+      cloud drive Only
+      <h5 class="hint">一个可以留存与分享资料的地方</h5>
+    </section>
+    <div class="login-group">
+      <clr-input-container>
+        <label class="clr-sr-only">Email</label>
+        <input type="email" name="email" clrInput placeholder="邮箱" required email="true" [(ngModel)]="login.email">
+        <clr-control-error *clrIfError="'required'">邮箱不可为空</clr-control-error>
+        <clr-control-error *clrIfError="'email'">邮箱格式错误</clr-control-error>
+      </clr-input-container>
+      <clr-password-container>
+        <label class="clr-sr-only">Password</label>
+        <input type="password" name="password" clrPassword placeholder="密码" required pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&.]).{8,}" [(ngModel)]="login.password">
+        <clr-control-helper>
+          至少8位字符，其中包含大小写字母、数字和特殊符号
+        </clr-control-helper>
+        <clr-control-error *clrIfError="'pattern'">密码格式错误，特殊符号可以是!@#$%^&*.</clr-control-error>
+      </clr-password-container>
+      <clr-checkbox-wrapper>
+        <label>记住我</label>
+        <input type="checkbox" name="rememberMe" clrCheckbox [(ngModel)]="login.rememberMe">
+      </clr-checkbox-wrapper>
+      <div [hidden]="errorHidden" class="error active">
+        邮箱或密码不合法
+      </div>
+      <button type="submit" class="btn btn-primary" (click)="onLogin()">登录</button>
+    </div>
+    <button class="btn btn-link btn-sm" (click)="signupHidden = !signupHidden">没有账号？注册一个</button>
+  </form>
+</div>
+<!--注册弹窗-->
+<app-sign-up [hidden]="signupHidden" [(modalHidden)]="signupHidden"></app-sign-up>

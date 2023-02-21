@@ -1,0 +1,25 @@
+<!-- Site Layout -->
+<div class="main-container">
+<!-- Top Navigation -->
+  <app-header></app-header>
+<!-- Content -->
+  <div class="content-container">
+    <div class="content-area">
+      文件列表
+    </div>
+    <clr-vertical-nav>
+      <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
+        <cds-icon shape="clock"></cds-icon>
+        最近使用
+      </a>
+      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">
+        <cds-icon shape="picture"></cds-icon>
+        图片
+      </a>
+      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">
+        <cds-icon shape="file"></cds-icon>
+        文稿
+      </a>
+    </clr-vertical-nav>
+  </div>
+</div>

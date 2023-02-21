@@ -1,0 +1,25 @@
+<header class="header header-6">
+  <div class="branding">
+    <a class="nav-link">
+      <cds-icon shape="cloud"></cds-icon>
+      <span class="title">Only</span>
+    </a>
+  </div>
+  <form class="search">
+    <label for="search_input">
+      <input id="search_input" type="text" placeholder="搜索文件……">
+    </label>
+  </form>
+  <div class="header-actions">
+    <clr-dropdown>
+      <button class="nav-icon" clrDropdownTrigger aria-label="toggle settings menu">
+        <cds-icon shape="cog"></cds-icon>
+        <cds-icon shape="angle" direction="down"></cds-icon>
+      </button>
+      <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
+        <a href="..." clrDropdownItem>偏好设置</a>
+        <a href="..." clrDropdownItem>退出登录</a>
+      </clr-dropdown-menu>
+    </clr-dropdown>
+  </div>
+</header>

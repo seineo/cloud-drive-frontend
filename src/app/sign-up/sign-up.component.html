@@ -1,0 +1,96 @@
+<div class="modal">
+  <div class="modal-dialog" role="dialog" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button aria-label="Close" class="close" type="button" (click)="closeModal()">
+          <cds-icon shape="close"></cds-icon>
+        </button>
+        <h3 class="modal-title">注册</h3>
+      </div>
+      <div class="modal-body">
+        <form clrStepper [formGroup]="form">
+          <clr-stepper-panel formGroupName="info">
+            <clr-step-title>基本信息</clr-step-title>
+            <clr-step-content *clrIfExpanded>
+              <clr-input-container>
+                <label>昵称</label>
+                <input clrInput name="name" formControlName="name"/>
+                <clr-control-error *clrIfError="'required'">不可为空</clr-control-error>
+                <clr-control-error *clrIfError="'maxlength'">长度最大为20个字符</clr-control-error>
+              </clr-input-container>
+
+              <clr-input-container>
+                <label>邮箱</label>
+                <input clrInput type="email" name="email" formControlName="email"/>
+                <clr-control-error *clrIfError="'required'">不可为空</clr-control-error>
+                <clr-control-error *clrIfError="'email'">格式错误</clr-control-error>
+              </clr-input-container>
+
+              <button type="button" class="btn btn-outline" (click)="emailClickNext()">
+                下一步
+              </button>
+              <button #emailNext clrStepButton="next" hidden></button>
+
+            </clr-step-content>
+          </clr-stepper-panel>
+
+          <clr-stepper-panel formGroupName="auth">
+            <clr-step-title>邮箱验证</clr-step-title>
+            <clr-step-content *clrIfExpanded>
+              <clr-input-container>
+                <label>请输入我们发往{{form.get("info.email")?.value}}的验证码（15分钟内有效）</label>
+                <input clrInput name="code" formControlName="code"/>
+                <clr-control-error *clrIfError="'required'">不可为空</clr-control-error>
+              </clr-input-container>
+              <button type="button" class="btn btn-link btn-sm" (click)="sendAuthCode()"><small>没有收到验证码或遇到了问题？再次发送验证码</small></button>
+              <br>
+<!--              告警-->
+              <div class="alert alert-danger alert-sm" role="alert" [hidden]="codeErrorHidden">
+                <div class="alert-items">
+                  <div class="alert-item static">
+                    <div class="alert-icon-wrapper">
+                      <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+                    </div>
+                    <span class="alert-text">验证码错误</span>
+                  </div>
+                </div>
+              </div>
+<!--              下一步按钮，一个用于处理数据，一个隐藏的用于跳转到下一面板-->
+              <button type="button" class="btn btn-outline" [clrLoading]="codeBtnState" (click)="checkCode()">
+                下一步
+              </button>
+              <button #codeNext clrStepButton="next" hidden></button>
+            </clr-step-content>
+          </clr-stepper-panel>
+
+          <clr-stepper-panel formGroupName="password">
+            <clr-step-title>密码填写</clr-step-title>
+            <clr-step-content *clrIfExpanded>
+              <clr-password-container>
+                <label>密码</label>
+                <input type="password" name="password" clrPassword formControlName="password">
+                <clr-control-helper>
+                  至少8位字符，其中包含大小写字母、数字和特殊符号
+                </clr-control-helper>
+                <clr-control-error *clrIfError="'required'">不可为空</clr-control-error>
+                <clr-control-error *clrIfError="'pattern'">密码格式错误，特殊符号可以是!@#$%^&*.</clr-control-error>
+              </clr-password-container>
+              <clr-password-container>
+                <label>确认密码</label>
+                <input type="password" name="passwordConfirm" clrPassword formControlName="confirm">
+                <clr-control-error *clrIfError="'required'">不可为空</clr-control-error>
+              </clr-password-container>
+              <clr-alert class="alert-sm" *ngIf="form.get('password')?.errors?.['match_error'] && (form.get('password.confirm')?.touched || form.get('password.confirm')?.dirty)" clrAlertType="danger" [clrAlertClosable]="false">
+                密码必须匹配
+              </clr-alert>
+
+              <button class="btn  btn-primary" [disabled]="!form.valid" (click)="submit()">提交</button>
+<!--              <button #passwordNext clrStepButton="next" hidden></button>-->
+            </clr-step-content>
+          </clr-stepper-panel>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" aria-hidden="true"></div>

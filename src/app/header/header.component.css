@@ -1,8 +1,5 @@
-.search>.nav-icon{
-  margin:0
-}
-
 .search {
+  border: 1px;
   flex: 1 1 auto;
   max-width: none;
 }
