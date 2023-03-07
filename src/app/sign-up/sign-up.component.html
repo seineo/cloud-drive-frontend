@@ -25,7 +25,7 @@
                 <clr-control-error *clrIfError="'required'">不可为空</clr-control-error>
                 <clr-control-error *clrIfError="'email'">格式错误</clr-control-error>
               </clr-input-container>
-
+              <!--              下一步按钮，一个用于处理数据，一个隐藏的用于跳转到下一面板-->
               <button type="button" class="btn btn-outline" (click)="emailClickNext()">
                 下一步
               </button>
@@ -56,7 +56,7 @@
                 </div>
               </div>
 <!--              下一步按钮，一个用于处理数据，一个隐藏的用于跳转到下一面板-->
-              <button type="button" class="btn btn-outline" [clrLoading]="codeBtnState" (click)="checkCode()">
+              <button type="button" class="btn btn-outline" (click)="checkCode()">
                 下一步
               </button>
               <button #codeNext clrStepButton="next" hidden></button>

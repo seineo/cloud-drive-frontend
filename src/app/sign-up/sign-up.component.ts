@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, Output, ViewChild,} from '@angular/core';
 import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from "@angular/forms";
 import {ClrLoadingState, ClrStepButton} from "@clr/angular";
-import {LoginService} from "../login.service";
+import {LoginService} from "../services/login.service";
 import { Router} from "@angular/router";
 
 @Component({
@@ -15,7 +15,7 @@ export class SignUpComponent {
   @Output() modalHiddenChange = new EventEmitter<boolean>();
   codeErrorHidden = true;
   form: FormGroup;
-  codeBtnState = ClrLoadingState.DEFAULT;
+  emailID = "";
   @ViewChild("emailNext", {static:false, read: ClrStepButton}) emailNextButton!: ClrStepButton;
   @ViewChild("codeNext", {static:false, read: ClrStepButton}) codeNextButton!: ClrStepButton;
   @ViewChild("passwordNext", {static:false, read: ClrStepButton}) passwordNextButton!: ClrStepButton;
@@ -50,11 +50,16 @@ export class SignUpComponent {
   sendAuthCode() {
     let email = this.form.get("info.email")?.value;
     console.log("authCode target email:", email)
-    this.loginService.sendAuthEmail(email).subscribe(data => console.log("sendCode response:", data));
+    this.loginService.sendAuthEmail(email).subscribe(data => {
+      console.log("sendCode response:", data)
+      this.emailID = data.emailID
+    });
   }
 
   emailClickNext() {
-    this.sendAuthCode();
+    if (this.form.get("info")?.valid) {  // means input passes all validation
+      this.sendAuthCode()
+    }
     this.emailNextButton.navigateToNextPanel();
   }
 
@@ -62,17 +67,14 @@ export class SignUpComponent {
     let inputCode = this.form.get("auth.code")?.value;
     let email = this.form.get("info.email")?.value;
 
-    this.codeBtnState = ClrLoadingState.LOADING;
-    this.loginService.getAuthCode(email).subscribe(data => {
+    this.loginService.getAuthCode(this.emailID, email).subscribe(data => {
       console.log("input: %s code: %s", inputCode, data.code)
       if (data.code === inputCode) {
         console.log("auth pass");
-        this.codeBtnState = ClrLoadingState.SUCCESS;
         this.codeErrorHidden = true;
         this.codeNextButton.navigateToNextPanel();
       } else {
         console.log("auth fail");
-        this.codeBtnState = ClrLoadingState.ERROR;
         this.codeErrorHidden = false;
       }
     })
@@ -87,11 +89,16 @@ export class SignUpComponent {
     let email = this.form.get("info.email")?.value;
     let password = this.form.get("info.password")?.value;
     this.loginService.signUp(name, email, password).subscribe(
-      data => this.loginService.login(data.user_id).subscribe(
-        resp => console.log("post %s, success login with header %s", data.user_id, resp.headers)
-      )
+      data => {
+        console.log("user registered:", data.user);
+        this.loginService.login(email, password).subscribe(
+          data => {
+            console.log("user logged in:", data.user);
+            this.redirectHome()
+          }
+        )
+      }
     );
-    this.redirectHome();
   }
 }
 

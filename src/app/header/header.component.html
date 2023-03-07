@@ -17,8 +17,8 @@
         <cds-icon shape="angle" direction="down"></cds-icon>
       </button>
       <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
-        <a href="..." clrDropdownItem>偏好设置</a>
-        <a href="..." clrDropdownItem>退出登录</a>
+        <div class="dropdown-item" (click)="redirect('settings')">设置</div>
+        <div class="dropdown-item" (click)="redirect('login')">退出</div>
       </clr-dropdown-menu>
     </clr-dropdown>
   </div>

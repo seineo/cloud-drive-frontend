@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {loginForm} from "../user";
-import {LoginService} from "../login.service";
+import {LoginService} from "../services/login.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -9,16 +9,27 @@ import {LoginService} from "../login.service";
 })
 
 export class LoginComponent {
-  login = new loginForm("","", false)
-  errorHidden = true
-  signupHidden = true
+  errorHidden = true;
+  signupHidden = true;
 
-  constructor(private loginService: LoginService) {
-    console.log(loginService.currentUser)
+  email = "";
+  password = "";
+  rememberMe = false;
+
+  constructor(private loginService: LoginService, private router: Router) {
   }
 
+  redirectHome() {
+    this.router.navigate(['/']);
+  }
   onLogin() {
-    console.log(this.login)
+    this.loginService.login(this.email, this.password).subscribe(
+      data => {
+        console.log("user logged in:", data.user)
+        this.redirectHome()
+      }
+    )
   }
+
 
 }

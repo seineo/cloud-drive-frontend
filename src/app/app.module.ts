@@ -23,7 +23,7 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon);
     SiteLayoutComponent,
     HeaderComponent,
     LoginComponent,
-    SignUpComponent
+    SignUpComponent,
   ],
     imports: [
         BrowserModule,
