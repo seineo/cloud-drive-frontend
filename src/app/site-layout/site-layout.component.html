@@ -21,13 +21,33 @@
     </clr-vertical-nav>
 
     <div class="content-area">
+      <div class="container">
+        <nav class="breadcrumbs">
+          <a href="#">Home</a>
+          <span class="separator">/</span>
+          <a href="#">Category</a>
+          <span class="separator">/</span>
+          <a href="#">Subcategory</a>
+          <span class="separator">/</span>
+          <span class="current-page">Current Page</span>
+        </nav>
+        <div class="file-display">
+          <span class="label">Display:</span>
+          <div class="toggle-buttons">
+            <button class="button active">Grid</button>
+            <button class="button">List</button>
+          </div>
+        </div>
+      </div>
+
+
       <div class="clr-row">
         <div class="clr-col-2" *ngFor="let data of testData">
           <a class="card clickable" (dblclick)="onDBClick()">
-            <div class="card-img">
+            <span class="card-img">
               <img src="./assets/file.svg" alt="for file type">
-            </div>
-            <div class="card-block" style="text-align: center">
+            </span>
+            <div class="card-block" style="text-align: center;">
               <p class="card-text">
                 {{truncateMiddle(data)}}
               </p>
@@ -35,6 +55,18 @@
           </a>
         </div>
       </div>
+
+      <nav aria-label="pagination" style="margin-top: 1em; padding-top: 0.5em">
+        <ul class="pagination">
+          <li><a href=""><span aria-hidden="true">&laquo;</span><span class="visuallyhidden">prev</span></a></li>
+          <li><a href="">1</a></li>
+          <li><a href="" aria-current="page">2</a></li>
+          <li><a href="">3</a></li>
+          <li><a href="">4</a></li>
+          <li><a href=""><span class="visuallyhidden">next</span><span aria-hidden="true">&raquo;</span></a></li>
+        </ul>
+      </nav>
+
     </div>
   </div>
 </div>
