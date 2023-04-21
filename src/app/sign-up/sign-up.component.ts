@@ -2,7 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, Output, ViewChild,} from '@a
 import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from "@angular/forms";
 import {ClrLoadingState, ClrStepButton} from "@clr/angular";
 import {LoginService} from "../services/login.service";
-import { Router} from "@angular/router";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-sign-up',
@@ -16,9 +16,9 @@ export class SignUpComponent {
   codeErrorHidden = true;
   form: FormGroup;
   emailID = "";
-  @ViewChild("emailNext", {static:false, read: ClrStepButton}) emailNextButton!: ClrStepButton;
-  @ViewChild("codeNext", {static:false, read: ClrStepButton}) codeNextButton!: ClrStepButton;
-  @ViewChild("passwordNext", {static:false, read: ClrStepButton}) passwordNextButton!: ClrStepButton;
+  @ViewChild("emailNext", {static: false, read: ClrStepButton}) emailNextButton!: ClrStepButton;
+  @ViewChild("codeNext", {static: false, read: ClrStepButton}) codeNextButton!: ClrStepButton;
+  @ViewChild("passwordNext", {static: false, read: ClrStepButton}) passwordNextButton!: ClrStepButton;
 
   closeModal() {
     this.modalHidden = true;
@@ -50,10 +50,13 @@ export class SignUpComponent {
   sendAuthCode() {
     let email = this.form.get("info.email")?.value;
     console.log("authCode target email:", email)
-    this.loginService.sendAuthEmail(email).subscribe(data => {
-      console.log("sendCode response:", data)
-      this.emailID = data.emailID
-    });
+    this.loginService.sendAuthEmail(email).subscribe(
+      data => {
+        console.log("sendCode response:", data)
+        this.emailID = data.emailID
+      },
+      error => console.error(error)
+    );
   }
 
   emailClickNext() {
@@ -67,17 +70,20 @@ export class SignUpComponent {
     let inputCode = this.form.get("auth.code")?.value;
     let email = this.form.get("info.email")?.value;
 
-    this.loginService.getAuthCode(this.emailID, email).subscribe(data => {
-      console.log("input: %s code: %s", inputCode, data.code)
-      if (data.code === inputCode) {
-        console.log("auth pass");
-        this.codeErrorHidden = true;
-        this.codeNextButton.navigateToNextPanel();
-      } else {
-        console.log("auth fail");
-        this.codeErrorHidden = false;
-      }
-    })
+    this.loginService.getAuthCode(this.emailID, email).subscribe(
+      data => {
+        console.log("input: %s code: %s", inputCode, data.code)
+        if (data.code === inputCode) {
+          console.log("auth pass");
+          this.codeErrorHidden = true;
+          this.codeNextButton.navigateToNextPanel();
+        } else {
+          console.log("auth fail");
+          this.codeErrorHidden = false;
+        }
+      },
+      error => console.error(error)
+    )
   }
 
   redirectHome() {
@@ -97,7 +103,8 @@ export class SignUpComponent {
             this.redirectHome()
           }
         )
-      }
+      },
+      error => console.error(error)
     );
   }
 }
@@ -111,8 +118,8 @@ function matchValidator(
     let stringTwo = controlTwo.value;
     // console.log("password: ", stringOne);
     // console.log("confirm: ", stringTwo);
-    if (stringOne!== stringTwo)
-      return { match_error: 'Value does not match' };
+    if (stringOne !== stringTwo)
+      return {match_error: 'Value does not match'};
     return null;
   };
 }

@@ -12,8 +12,9 @@ import { HeaderComponent } from './header/header.component';
 import { LoginComponent } from './login/login.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { SignUpComponent } from './sign-up/sign-up.component';
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import {AuthInterceptorService} from "./services/auth-interceptor.service";
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon);
 @NgModule({
@@ -34,7 +35,13 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon);
         HttpClientModule,
         ReactiveFormsModule
     ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
