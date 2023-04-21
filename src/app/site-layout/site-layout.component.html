@@ -32,41 +32,45 @@
           <span class="current-page">Current Page</span>
         </nav>
         <div class="file-display">
-          <span class="label">Display:</span>
-          <div class="toggle-buttons">
-            <button class="button active">Grid</button>
-            <button class="button">List</button>
+          <div class="dropdown bottom-right open">
+            <button class="dropdown-toggle btn btn-primary" type="button">
+              新建
+              <cds-icon shape="angle" direction="down"></cds-icon>
+            </button>
+            <div class="dropdown-menu">
+              <div class="dropdown-item">新建文件</div>
+              <div class="dropdown-item">新建文件夹</div>
+            </div>
           </div>
         </div>
       </div>
+      <clr-datagrid>
+        <clr-dg-column>User ID</clr-dg-column>
+<!--        clrDGField binds model properties to columns-->
+        <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+        <clr-dg-column [clrDgField]="'creation'">Creation date</clr-dg-column>
+        <clr-dg-column [clrDgField]="'pokemon.name'">Pokemon</clr-dg-column>
+        <clr-dg-column [clrDgField]="'color'">Favorite color</clr-dg-column>
+        <clr-dg-column [clrDgField]="'wins'" [clrDgColType]="'number'">Wins</clr-dg-column>
 
+        <clr-dg-row *clrDgItems="let user of testData">
+          <clr-dg-cell> 1 </clr-dg-cell>
+          <clr-dg-cell> 2 </clr-dg-cell>
+<!--          <clr-dg-cell>{{user.creation | date}}</clr-dg-cell>-->
+          <clr-dg-cell> 3 </clr-dg-cell>
+          <clr-dg-cell> 4 </clr-dg-cell>
+          <clr-dg-cell> 5 </clr-dg-cell>
+          <clr-dg-cell> 6 </clr-dg-cell>
+        </clr-dg-row>
 
-      <div class="clr-row">
-        <div class="clr-col-2" *ngFor="let data of testData">
-          <a class="card clickable" (dblclick)="onDBClick()">
-            <span class="card-img">
-              <img src="./assets/file.svg" alt="for file type">
-            </span>
-            <div class="card-block" style="text-align: center;">
-              <p class="card-text">
-                {{truncateMiddle(data)}}
-              </p>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <nav aria-label="pagination" style="margin-top: 1em; padding-top: 0.5em">
-        <ul class="pagination">
-          <li><a href=""><span aria-hidden="true">&laquo;</span><span class="visuallyhidden">prev</span></a></li>
-          <li><a href="">1</a></li>
-          <li><a href="" aria-current="page">2</a></li>
-          <li><a href="">3</a></li>
-          <li><a href="">4</a></li>
-          <li><a href=""><span class="visuallyhidden">next</span><span aria-hidden="true">&raquo;</span></a></li>
-        </ul>
-      </nav>
-
+        <clr-dg-footer>
+          <clr-dg-pagination #pagination [clrDgPageSize]="10">
+            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">Files per page</clr-dg-page-size>
+            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+            of {{pagination.totalItems}} users
+          </clr-dg-pagination>
+        </clr-dg-footer>
+      </clr-datagrid>
     </div>
   </div>
 </div>

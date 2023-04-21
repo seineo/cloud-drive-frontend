@@ -7,23 +7,23 @@ import {ClarityIcons, cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon} from
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BaseLayoutComponent } from './base-layout/base-layout.component';
 import { SiteLayoutComponent } from './site-layout/site-layout.component';
 import { HeaderComponent } from './header/header.component';
 import { LoginComponent } from './login/login.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { HttpClientModule } from '@angular/common/http';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon);
 @NgModule({
   declarations: [
     AppComponent,
-    BaseLayoutComponent,
     SiteLayoutComponent,
     HeaderComponent,
     LoginComponent,
     SignUpComponent,
+    PageNotFoundComponent,
   ],
     imports: [
         BrowserModule,

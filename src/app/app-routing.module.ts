@@ -1,25 +1,27 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {BaseLayoutComponent} from "./base-layout/base-layout.component";
 import {SiteLayoutComponent} from "./site-layout/site-layout.component";
 import {LoginComponent} from "./login/login.component";
+import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 
+// 路由匹配有顺序，因此应该具体的在前面
 const routes: Routes = [
   {
-    path: '',
-    component: SiteLayoutComponent,
-    children: [
-    ]
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'home',
+    component: SiteLayoutComponent
   },
   {
     path: '',
-    component: BaseLayoutComponent,
-    children: [
-      {
-        path: 'login',
-        component: LoginComponent
-      }
-    ]
+    redirectTo: '/home',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    component: PageNotFoundComponent
   }
 ];
 
