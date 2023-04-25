@@ -1,32 +1,38 @@
-import { Component } from '@angular/core';
-import {Router} from "@angular/router";
+import {Component, OnInit} from '@angular/core';
+import {FileService} from "../services/file.service";
+
+
+interface File {
+  Hash: string,
+  Name: string
+  UserID: number
+  FileType: string // dir, pdf, img, video...
+  Size: number
+  DirPath: string // virtual directory path shown for users
+  Location: string // real file storage path
+  CreateTime: string
+}
 
 @Component({
   selector: 'app-site-layout',
   templateUrl: './site-layout.component.html',
   styleUrls: ['./site-layout.component.css']
 })
-export class SiteLayoutComponent {
-  testData:string[] = [];
+export class SiteLayoutComponent implements OnInit {
+  files: File[] = [];
+  curDir = ["我的云盘"];
 
-  constructor(private router: Router) {
-    for (let i = 0; i < 5; i++) {
-      this.testData.push("file" + i.toString() + ".txt");
-    }
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hello-world!-I-am-liyuewei.txt");
-    this.testData.push("hi.txt");
+  constructor(private fileService: FileService) {
+  }
 
+  ngOnInit(): void {
+    this.fileService.getFilesMetadata(this.curDir[0]).subscribe(data => {
+      this.files = data.files;
+    });
   }
 
   truncateMiddle(word: string) {
-    const tooLongChars = 20; // arbitrary
+    const tooLongChars = 20;
 
     if (word.length < tooLongChars) {
       return word;
@@ -38,7 +44,44 @@ export class SiteLayoutComponent {
     return word.slice(0, charsOnEitherSide) + ellipsis + word.slice(-charsOnEitherSide);
   }
 
-  onDBClick() {
-    this.router.navigate(['/login']);
+
+  navigatePath(index: number) {
+    let dirPath = this.curDir[0];
+    for (let i = 1; i <= index; i++) {
+      dirPath = dirPath + "/" + this.curDir[i];
+    }
+    console.log("target dirPath:", dirPath)
+    this.fileService.getFilesMetadata(dirPath).subscribe(data => {
+      this.files = data.files;
+    });
+    // 删除目标目录后的路径
+    this.curDir.splice(index + 1);
+    console.log("after navigate, curDir:", this.curDir);
+  }
+
+  // 如果是文件夹，进入该文件夹；如果是文件，预览
+  digFile(file: File) {
+    if (file.FileType == "dir") {
+      this.curDir.push(file.Name);
+      let dirPath = this.curDir[0];
+      for (let i = 1; i < this.curDir.length; i++) {
+        dirPath = dirPath + "/" + this.curDir[i];
+      }
+      console.log("target dirPath:", dirPath)
+      this.fileService.getFilesMetadata(dirPath).subscribe(data => {
+        this.files = data.files;
+      });
+    } else {
+      console.log("预览功能暂不支持");
+      // TODO 增加预览功能
+    }
+  }
+
+  uploadFile() {
+
+  }
+
+  createDir() {
+
   }
 }

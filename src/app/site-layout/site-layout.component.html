@@ -10,64 +10,71 @@
         <cds-icon shape="clock"></cds-icon>
         最近使用
       </a>
-      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">
-        <cds-icon shape="picture"></cds-icon>
-        图片
+      <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
+        <cds-icon shape="share" ></cds-icon>
+        我的共享
       </a>
-      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">
-        <cds-icon shape="file"></cds-icon>
-        文稿
+      <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
+        <cds-icon shape="star"></cds-icon>
+        星标文件
       </a>
+      <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
+        <cds-icon shape="recycle"></cds-icon>
+        回收站
+      </a>
+<!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
+<!--        <cds-icon shape="picture"></cds-icon>-->
+<!--        图片-->
+<!--      </a>-->
+<!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
+<!--        <cds-icon shape="file"></cds-icon>-->
+<!--        文稿-->
+<!--      </a>-->
     </clr-vertical-nav>
 
     <div class="content-area">
       <div class="container">
         <nav class="breadcrumbs">
-          <a href="#">Home</a>
-          <span class="separator">/</span>
-          <a href="#">Category</a>
-          <span class="separator">/</span>
-          <a href="#">Subcategory</a>
-          <span class="separator">/</span>
-          <span class="current-page">Current Page</span>
+<!--          current directory has different style, the root has no prefix separator-->
+          <div *ngFor="let dir of curDir; let i = index">
+            <span class="separator" *ngIf="i !== 0">/</span>
+            <a *ngIf="i !== curDir.length - 1" (click)="navigatePath(i)">{{dir}}</a>
+            <span class="current-page" *ngIf="i === curDir.length - 1">{{dir}}</span>
+          </div>
         </nav>
         <div class="file-display">
           <div class="dropdown bottom-right open">
             <button class="dropdown-toggle btn btn-primary" type="button">
-              新建
+              <cds-icon shape="plus-circle"></cds-icon>
+              <span style="margin: 5px">新建</span>
               <cds-icon shape="angle" direction="down"></cds-icon>
             </button>
             <div class="dropdown-menu">
-              <div class="dropdown-item">新建文件</div>
-              <div class="dropdown-item">新建文件夹</div>
+              <div class="dropdown-item" (click)="uploadFile()">上传文件</div>
+              <div class="dropdown-item" (click)="createDir()">新建文件夹</div>
             </div>
           </div>
         </div>
       </div>
       <clr-datagrid>
-        <clr-dg-column>User ID</clr-dg-column>
 <!--        clrDGField binds model properties to columns-->
-        <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
-        <clr-dg-column [clrDgField]="'creation'">Creation date</clr-dg-column>
-        <clr-dg-column [clrDgField]="'pokemon.name'">Pokemon</clr-dg-column>
-        <clr-dg-column [clrDgField]="'color'">Favorite color</clr-dg-column>
-        <clr-dg-column [clrDgField]="'wins'" [clrDgColType]="'number'">Wins</clr-dg-column>
+        <clr-dg-column [clrDgField]="'name'">文件名</clr-dg-column>
+        <clr-dg-column [clrDgField]="'creation'">创建时间</clr-dg-column>
+        <clr-dg-column [clrDgField]="'size'">大小</clr-dg-column>
+        <clr-dg-column>操作</clr-dg-column>
 
-        <clr-dg-row *clrDgItems="let user of testData">
-          <clr-dg-cell> 1 </clr-dg-cell>
-          <clr-dg-cell> 2 </clr-dg-cell>
-<!--          <clr-dg-cell>{{user.creation | date}}</clr-dg-cell>-->
-          <clr-dg-cell> 3 </clr-dg-cell>
+        <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="digFile(file)">
+          <clr-dg-cell> {{truncateMiddle(file.Name)}} </clr-dg-cell>
+          <clr-dg-cell> {{file.CreateTime }} </clr-dg-cell>
+          <clr-dg-cell> {{file.Size}} </clr-dg-cell>
           <clr-dg-cell> 4 </clr-dg-cell>
-          <clr-dg-cell> 5 </clr-dg-cell>
-          <clr-dg-cell> 6 </clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
           <clr-dg-pagination #pagination [clrDgPageSize]="10">
-            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">Files per page</clr-dg-page-size>
+            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50]">Files per page</clr-dg-page-size>
             {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-            of {{pagination.totalItems}} users
+            of {{pagination.totalItems}} files
           </clr-dg-pagination>
         </clr-dg-footer>
       </clr-datagrid>
