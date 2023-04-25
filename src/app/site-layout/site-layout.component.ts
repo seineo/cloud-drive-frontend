@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FileService} from "../services/file.service";
-
+import * as uuid from 'uuid';
+import {Form, NgForm} from "@angular/forms";
 
 interface File {
   Hash: string,
@@ -21,6 +22,8 @@ interface File {
 export class SiteLayoutComponent implements OnInit {
   files: File[] = [];
   curDir = ["我的云盘"];
+  modelOpen = false;
+  newDirName = "";
 
   constructor(private fileService: FileService) {
   }
@@ -59,14 +62,19 @@ export class SiteLayoutComponent implements OnInit {
     console.log("after navigate, curDir:", this.curDir);
   }
 
+  getCurDir() {
+    let dirPath = this.curDir[0];
+    for (let i = 1; i < this.curDir.length; i++) {
+      dirPath = dirPath + "/" + this.curDir[i];
+    }
+    return dirPath;
+  }
+
   // 如果是文件夹，进入该文件夹；如果是文件，预览
   digFile(file: File) {
     if (file.FileType == "dir") {
       this.curDir.push(file.Name);
-      let dirPath = this.curDir[0];
-      for (let i = 1; i < this.curDir.length; i++) {
-        dirPath = dirPath + "/" + this.curDir[i];
-      }
+      let dirPath = this.getCurDir();
       console.log("target dirPath:", dirPath)
       this.fileService.getFilesMetadata(dirPath).subscribe(data => {
         this.files = data.files;
@@ -77,11 +85,26 @@ export class SiteLayoutComponent implements OnInit {
     }
   }
 
+
   uploadFile() {
 
   }
 
-  createDir() {
-
+  createDir(form: NgForm) {
+    let curDir = this.getCurDir();
+    this.fileService.uploadFile(curDir, this.newDirName, uuid.v4(), "dir").subscribe(
+      data => {
+        console.log("create dir:", data.file);
+        // refresh current directory
+        this.fileService.getFilesMetadata(curDir).subscribe(data => {
+          this.files = data.files;
+        });
+      },
+      error => {
+        console.error(error)
+      }
+    );
+    this.modelOpen = false;
+    form.reset();
   }
 }

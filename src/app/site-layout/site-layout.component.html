@@ -11,7 +11,7 @@
         最近使用
       </a>
       <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
-        <cds-icon shape="share" ></cds-icon>
+        <cds-icon shape="share"></cds-icon>
         我的共享
       </a>
       <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
@@ -22,20 +22,20 @@
         <cds-icon shape="recycle"></cds-icon>
         回收站
       </a>
-<!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
-<!--        <cds-icon shape="picture"></cds-icon>-->
-<!--        图片-->
-<!--      </a>-->
-<!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
-<!--        <cds-icon shape="file"></cds-icon>-->
-<!--        文稿-->
-<!--      </a>-->
+      <!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
+      <!--        <cds-icon shape="picture"></cds-icon>-->
+      <!--        图片-->
+      <!--      </a>-->
+      <!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
+      <!--        <cds-icon shape="file"></cds-icon>-->
+      <!--        文稿-->
+      <!--      </a>-->
     </clr-vertical-nav>
 
     <div class="content-area">
       <div class="container">
         <nav class="breadcrumbs">
-<!--          current directory has different style, the root has no prefix separator-->
+          <!--          current directory has different style, the root has no prefix separator-->
           <div *ngFor="let dir of curDir; let i = index">
             <span class="separator" *ngIf="i !== 0">/</span>
             <a *ngIf="i !== curDir.length - 1" (click)="navigatePath(i)">{{dir}}</a>
@@ -43,31 +43,31 @@
           </div>
         </nav>
         <div class="file-display">
-          <div class="dropdown bottom-right open">
-            <button class="dropdown-toggle btn btn-primary" type="button">
+          <clr-dropdown>
+            <button class="btn btn-primary" clrDropdownTrigger>
               <cds-icon shape="plus-circle"></cds-icon>
               <span style="margin: 5px">新建</span>
               <cds-icon shape="angle" direction="down"></cds-icon>
             </button>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" (click)="uploadFile()">上传文件</div>
-              <div class="dropdown-item" (click)="createDir()">新建文件夹</div>
-            </div>
-          </div>
+            <clr-dropdown-menu *clrIfOpen>
+              <div clrDropdownItem (click)="uploadFile()">上传文件</div>
+              <div clrDropdownItem (click)="modelOpen = true">新建文件夹</div>
+            </clr-dropdown-menu>
+          </clr-dropdown>
         </div>
       </div>
       <clr-datagrid>
-<!--        clrDGField binds model properties to columns-->
-        <clr-dg-column [clrDgField]="'name'">文件名</clr-dg-column>
-        <clr-dg-column [clrDgField]="'creation'">创建时间</clr-dg-column>
-        <clr-dg-column [clrDgField]="'size'">大小</clr-dg-column>
+        <!--        clrDGField binds model properties to columns-->
+        <clr-dg-column [clrDgField]="'Name'">文件名</clr-dg-column>
+        <clr-dg-column [clrDgField]="'CreateTime'">创建时间</clr-dg-column>
+        <clr-dg-column [clrDgField]="'Size'">大小</clr-dg-column>
         <clr-dg-column>操作</clr-dg-column>
 
         <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="digFile(file)">
           <clr-dg-cell> {{truncateMiddle(file.Name)}} </clr-dg-cell>
           <clr-dg-cell> {{file.CreateTime }} </clr-dg-cell>
           <clr-dg-cell> {{file.Size}} </clr-dg-cell>
-          <clr-dg-cell> 4 </clr-dg-cell>
+          <clr-dg-cell> 4</clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
@@ -81,3 +81,20 @@
     </div>
   </div>
 </div>
+
+<clr-modal [(clrModalOpen)]="modelOpen">
+  <h3 class="modal-title">新建文件夹</h3>
+  <div class="modal-body">
+    <form clrForm #modalForm=ngForm>
+      <clr-input-container>
+        <label>文件夹名称</label>
+        <input clrInput placeholder="未命名文件夹" name="name" required [(ngModel)]="newDirName"/>
+        <clr-control-error *clrIfError="'required'">不可为空</clr-control-error>
+      </clr-input-container>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="modelOpen = false">取消</button>
+    <button type="button" class="btn btn-primary" (click)="createDir(modalForm)" [disabled]="!modalForm.valid">确认</button>
+  </div>
+</clr-modal>
