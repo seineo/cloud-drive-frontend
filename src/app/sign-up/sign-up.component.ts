@@ -93,7 +93,7 @@ export class SignUpComponent {
   submit() {
     let name = this.form.get("info.name")?.value;
     let email = this.form.get("info.email")?.value;
-    let password = this.form.get("info.password")?.value;
+    let password = this.form.get("password.password")?.value;
     this.loginService.signUp(name, email, password).subscribe(
       data => {
         console.log("user registered:", data.user);
@@ -101,8 +101,9 @@ export class SignUpComponent {
           data => {
             console.log("user logged in:", data.user);
             this.redirectHome()
-          }
-        )
+          },
+          error => console.log(error)
+        );
       },
       error => console.error(error)
     );
