@@ -11,6 +11,11 @@
     </label>
   </form>
   <div class="header-actions">
+    <a class="nav-link " (click)="up_down_load_hidden = false">
+      <cds-icon class="icon" shape="download-cloud"></cds-icon>
+      <cds-icon class="icon" shape="upload-cloud"></cds-icon>
+    </a>
+
     <clr-dropdown>
       <button class="nav-icon" clrDropdownTrigger aria-label="toggle settings menu">
         <cds-icon shape="cog"></cds-icon>
@@ -23,3 +28,5 @@
     </clr-dropdown>
   </div>
 </header>
+
+<app-up-down-load [hidden]="up_down_load_hidden" [(modalHidden)]="up_down_load_hidden"></app-up-down-load>

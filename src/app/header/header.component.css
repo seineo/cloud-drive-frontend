@@ -12,3 +12,7 @@
 .search > label > input {
   width: 100%;
 }
+
+a:hover {
+  cursor: pointer;
+}

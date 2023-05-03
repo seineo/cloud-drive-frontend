@@ -19,17 +19,9 @@
         星标文件
       </a>
       <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
-        <cds-icon shape="recycle"></cds-icon>
+        <cds-icon shape="trash"></cds-icon>
         回收站
       </a>
-      <!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
-      <!--        <cds-icon shape="picture"></cds-icon>-->
-      <!--        图片-->
-      <!--      </a>-->
-      <!--      <a clrVerticalNavLink routerLink="./pictures" routerLinkActive="active">-->
-      <!--        <cds-icon shape="file"></cds-icon>-->
-      <!--        文稿-->
-      <!--      </a>-->
     </clr-vertical-nav>
 
     <div class="content-area">
@@ -50,31 +42,40 @@
               <cds-icon shape="angle" direction="down"></cds-icon>
             </button>
             <clr-dropdown-menu *clrIfOpen>
-              <div clrDropdownItem (click)="uploadFile()">上传文件</div>
+              <div clrDropdownItem (click)="fileUpload.click()">上传文件</div>
               <div clrDropdownItem (click)="modelOpen = true">新建文件夹</div>
             </clr-dropdown-menu>
           </clr-dropdown>
         </div>
       </div>
+
       <clr-datagrid>
         <!--        clrDGField binds model properties to columns-->
         <clr-dg-column [clrDgField]="'Name'">文件名</clr-dg-column>
         <clr-dg-column [clrDgField]="'CreateTime'">创建时间</clr-dg-column>
         <clr-dg-column [clrDgField]="'Size'">大小</clr-dg-column>
-        <clr-dg-column>操作</clr-dg-column>
+        <!--        <clr-dg-column>操作</clr-dg-column>-->
+        <clr-dg-placeholder>这里空空如也</clr-dg-placeholder>
 
         <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="digFile(file)">
+          <clr-dg-action-overflow>
+            <button class="action-item">预览</button>
+            <button class="action-item">下载</button>
+            <button class="action-item">共享</button>
+            <button class="action-item">星标</button>
+            <button class="action-item">删除</button>
+
+          </clr-dg-action-overflow>
           <clr-dg-cell> {{truncateMiddle(file.Name)}} </clr-dg-cell>
           <clr-dg-cell> {{file.CreateTime }} </clr-dg-cell>
           <clr-dg-cell> {{file.Size}} </clr-dg-cell>
-          <clr-dg-cell> 4</clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
           <clr-dg-pagination #pagination [clrDgPageSize]="10">
-            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50]">Files per page</clr-dg-page-size>
+            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50]">每页文件数</clr-dg-page-size>
+            {{pagination.totalItems}} 个文件中的
             {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-            of {{pagination.totalItems}} files
           </clr-dg-pagination>
         </clr-dg-footer>
       </clr-datagrid>
@@ -82,6 +83,10 @@
   </div>
 </div>
 
+<!--upload multiple files-->
+<input type="file" name="files" multiple hidden (change)="onFileSelected($event)" #fileUpload>
+
+<!--modal for creating new directory-->
 <clr-modal [(clrModalOpen)]="modelOpen">
   <h3 class="modal-title">新建文件夹</h3>
   <div class="modal-body">
@@ -95,6 +100,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="modelOpen = false">取消</button>
-    <button type="button" class="btn btn-primary" (click)="createDir(modalForm)" [disabled]="!modalForm.valid">确认</button>
+    <button type="button" class="btn btn-primary" (click)="createDir(modalForm)" [disabled]="!modalForm.valid">确认
+    </button>
   </div>
 </clr-modal>

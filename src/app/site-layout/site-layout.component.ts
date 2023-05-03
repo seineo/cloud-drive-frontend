@@ -2,6 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {FileService} from "../services/file.service";
 import * as uuid from 'uuid';
 import {Form, NgForm} from "@angular/forms";
+import {SHA1} from 'crypto-js'
+import {error} from "@angular/compiler-cli/src/transformers/util";
+import {environment} from "../../environments/environment.development";
+
+// import * as fs from 'fs'
 
 interface File {
   Hash: string,
@@ -24,6 +29,9 @@ export class SiteLayoutComponent implements OnInit {
   curDir = ["我的云盘"];
   modelOpen = false;
   newDirName = "";
+  showUploadToast = true;
+  uploadProgress = 0.5
+  uploadStatus = "running";
 
   constructor(private fileService: FileService) {
   }
@@ -85,11 +93,6 @@ export class SiteLayoutComponent implements OnInit {
     }
   }
 
-
-  uploadFile() {
-
-  }
-
   createDir(form: NgForm) {
     let curDir = this.getCurDir();
     this.fileService.uploadFile(curDir, this.newDirName, uuid.v4(), "dir").subscribe(
@@ -101,10 +104,69 @@ export class SiteLayoutComponent implements OnInit {
         });
       },
       error => {
-        console.error(error)
+        console.error(error);
       }
     );
     this.modelOpen = false;
     form.reset();
+  }
+
+  async onFileSelected(event: Event) {
+    console.log("selected event:", event);
+    const files = (event.target as HTMLInputElement).files;
+    if (files) {
+      let file = files[0];   // 先假定只有一个文件
+      let fileHash = await this.fileService.hashFile(file);
+      console.log("file hash: ", fileHash);
+      // 使用hash查看是否有相同的文件，有则"秒传"
+      // 没有相同文件则上传该文件
+      this.fileService.fileExists(fileHash).subscribe( data => {
+          if (data.exist) { // 秒传
+            console.log("秒传");
+            // TODO 秒传的前端显示效果
+          } else { // 上传
+            if (file.size > environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
+              let curDir = this.getCurDir();
+              let fileName = file.name;
+              this.fileService.uploadFile(curDir, fileName, fileHash, file.type, file).subscribe(
+                data => {
+                  console.log("upload file:", fileName);
+                  console.log("response after uploading:", data.file);
+                },
+                error => {
+                  console.error(error);
+                }
+              )
+            } else {  // 文件大于阈值，分块上传
+              this.fileService.uploadFileInChunks(file, fileHash).subscribe({
+                  // 当前块处理成功
+                  next: (result) => {
+                    console.log("uploaded a chunk: ", result);
+                  },
+                  // 错误处理
+                  error: (error) => {
+                    console.error(error);
+                  },
+                  // 所有文件块上传完成，请求后端合并
+                  complete: () => {
+                    this.fileService.mergeFileChunks(fileHash).subscribe(
+                      data => {
+                        console.log("merged file chunks: ", data);
+                      },
+                      error => {
+                        console.error(error);
+                      }
+                    )
+                  }
+                }
+              )
+            }
+          }
+        },
+        error => {
+          console.error(error);
+        }
+      )
+    }
   }
 }

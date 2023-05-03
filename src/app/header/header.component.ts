@@ -7,6 +7,7 @@ import {Router} from "@angular/router";
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
+  up_down_load_hidden = true;
   constructor(private router: Router) {
   }
 

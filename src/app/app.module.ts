@@ -3,8 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ClarityModule } from "@clr/angular";
 import '@cds/core/icon/register.js';
-import {ClarityIcons, cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon,
-  plusCircleIcon,shareIcon,starIcon, recycleIcon} from '@cds/core/icon';
+import {
+  ClarityIcons, cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon,
+  plusCircleIcon, shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon
+} from '@cds/core/icon';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,9 +18,10 @@ import { SignUpComponent } from './sign-up/sign-up.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import {AuthInterceptorService} from "./services/auth-interceptor.service";
+import { UpDownLoadComponent } from './up-down-load/up-down-load.component';
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
-  shareIcon, starIcon, recycleIcon);
+  shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon);
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,6 +30,7 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
     LoginComponent,
     SignUpComponent,
     PageNotFoundComponent,
+    UpDownLoadComponent,
   ],
     imports: [
         BrowserModule,
