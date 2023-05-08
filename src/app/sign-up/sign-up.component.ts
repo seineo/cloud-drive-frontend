@@ -86,8 +86,8 @@ export class SignUpComponent {
     )
   }
 
-  redirectHome() {
-    this.router.navigate(['/']);
+  redirectHome(rootHash: string) {
+    this.router.navigate(['/home'], {state: {data: rootHash}});
   }
 
   submit() {
@@ -100,7 +100,7 @@ export class SignUpComponent {
         this.loginService.login(email, password).subscribe(
           data => {
             console.log("user logged in:", data.user);
-            this.redirectHome()
+            this.redirectHome(data.user.rootHash);
           },
           error => console.log(error)
         );

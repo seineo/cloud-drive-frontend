@@ -19,14 +19,14 @@ export class LoginComponent {
   constructor(private loginService: LoginService, private router: Router) {
   }
 
-  redirectHome() {
-    this.router.navigate(['/']);
+  redirectHome(rootHash: string) {
+    this.router.navigate(['/home'], {state: {data: rootHash}});
   }
   onLogin() {
     this.loginService.login(this.email, this.password).subscribe(
       data => {
         console.log("user logged in:", data.user)
-        this.redirectHome()
+        this.redirectHome(data.user.rootHash)
       }
     )
   }

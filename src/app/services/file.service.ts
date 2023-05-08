@@ -16,21 +16,27 @@ export class FileService {
   }
 
   // dirPath should start without slash
-  getFilesMetadata(dirPath: string): Observable<any> {
-    let url = environment.API_URL + "/api/v1/files/metadata/" + dirPath;
+  getFilesMetadata(fileHash: string): Observable<any> {
+    let url = environment.API_URL + "/api/v1/files/metadata/" + fileHash;
     return this.http.get(url, {withCredentials: true});
   }
 
   // create file or directory
-  uploadFile(dirPath: string, fileName: string, hash: string, fileType: string, file?: File): Observable<any> {
+  uploadFile(dirPath: string, fileName: string, fileHash: string, fileType: string, file?: File): Observable<any> {
     let url = environment.API_URL + "/api/v1/files/data/" + dirPath;
     let formData = new FormData();
-    formData.append("fileName", fileName);
-    formData.append("hash", hash);
-    formData.append("fileType", fileType);
+    let metadata = {
+      "fileHash": fileHash,
+      "fileName": fileName,
+      "fileType": fileType,
+      "dirPath": dirPath,
+      "fileSize": 0
+    };
     if (file) {
       formData.append("file", file);
+      metadata["fileSize"] = file.size;
     }
+    formData.append("metadata", JSON.stringify(metadata))
     return this.http.post(url, formData, {withCredentials: true});
   }
 
@@ -98,9 +104,34 @@ export class FileService {
   }
 
   uploadChunk(fileHash: string, chunkHash: string, index: number, totalChunks: number, blob: Blob): Observable<any> {
-    let url = "";
-    let formData = new FormData();
-    return this.http.post(url, formData, {withCredentials: true});
+    return new Observable<any>((observer) => {
+      let url = environment.API_URL + "/api/v1/files/chunks";
+      let fileReader = new FileReader();
+      fileReader.readAsArrayBuffer(blob);
+      let base64 = "";
+      fileReader.onload = () => {
+        // convert blob object to base64-encoded string
+        const buffer = fileReader.result as ArrayBuffer;
+        base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        let payload = {
+          "fileHash": fileHash,
+          "chunkHash": chunkHash,
+          "index": index,
+          "totalChunks": totalChunks,
+          "blob": base64,
+        };
+        console.log("payload:", payload);
+        this.http.post(url, payload, {withCredentials: true}).subscribe(
+          (response) => {
+            observer.next(response);
+            observer.complete();
+          },
+          (error) => {
+            observer.error(error);
+          }
+        );
+      }
+    });
   }
 
   uploadFileInChunks(file: File, fileHash: string): Observable<any> {
@@ -121,15 +152,20 @@ export class FileService {
       }, environment.CONCURRENT_LIMIT),
       // 上传文件块
       mergeMap(({index, blob, hash}) => {
-        return this.uploadChunk(fileHash, hash, index, totalChunks, blob);
+        return this.uploadChunk(fileHash, hash, index + 1, totalChunks, blob);
       }, environment.CONCURRENT_LIMIT),
     );
   }
 
-  mergeFileChunks(fileHash: string): Observable<any> {
-    let url = "";
-    let formData = new FormData();
-    formData.append("fileHash", fileHash);
-    return this.http.post(url, formData, {withCredentials: true});
+  mergeFileChunks(fileHash: string, fileName: string, fileType: string, dirPath: string, fileSize: number): Observable<any> {
+    let url = environment.API_URL + "/api/v1/files/chunks/" + fileHash;
+    let payload = {
+      "fileHash": fileHash,
+      "fileName": fileName,
+      "fileType": fileType,
+      "dirPath": dirPath,
+      "fileSize": fileSize
+    }
+    return this.http.post(url, payload, {withCredentials: true});
   }
 }

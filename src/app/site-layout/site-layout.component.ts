@@ -5,6 +5,7 @@ import {Form, NgForm} from "@angular/forms";
 import {SHA1} from 'crypto-js'
 import {error} from "@angular/compiler-cli/src/transformers/util";
 import {environment} from "../../environments/environment.development";
+import {Router} from "@angular/router";
 
 // import * as fs from 'fs'
 
@@ -25,6 +26,7 @@ interface File {
   styleUrls: ['./site-layout.component.css']
 })
 export class SiteLayoutComponent implements OnInit {
+  state: any;
   files: File[] = [];
   curDir = ["我的云盘"];
   modelOpen = false;
@@ -33,11 +35,16 @@ export class SiteLayoutComponent implements OnInit {
   uploadProgress = 0.5
   uploadStatus = "running";
 
-  constructor(private fileService: FileService) {
+  constructor(private fileService: FileService, private router: Router) {
+    const navigation = this.router.getCurrentNavigation();
+    this.state = navigation?.extras.state as {
+      data : string
+    }
   }
 
   ngOnInit(): void {
-    this.fileService.getFilesMetadata(this.curDir[0]).subscribe(data => {
+    // console.log("file hash: ", this.state.data);
+    this.fileService.getFilesMetadata(this.state.data).subscribe(data => {
       this.files = data.files;
     });
   }
@@ -120,12 +127,12 @@ export class SiteLayoutComponent implements OnInit {
       console.log("file hash: ", fileHash);
       // 使用hash查看是否有相同的文件，有则"秒传"
       // 没有相同文件则上传该文件
-      this.fileService.fileExists(fileHash).subscribe( data => {
+      this.fileService.fileExists(fileHash).subscribe(data => {
           if (data.exist) { // 秒传
             console.log("秒传");
             // TODO 秒传的前端显示效果
           } else { // 上传
-            if (file.size > environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
+            if (file.size < environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
               let curDir = this.getCurDir();
               let fileName = file.name;
               this.fileService.uploadFile(curDir, fileName, fileHash, file.type, file).subscribe(
@@ -149,7 +156,7 @@ export class SiteLayoutComponent implements OnInit {
                   },
                   // 所有文件块上传完成，请求后端合并
                   complete: () => {
-                    this.fileService.mergeFileChunks(fileHash).subscribe(
+                    this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDir(), file.size).subscribe(
                       data => {
                         console.log("merged file chunks: ", data);
                       },
