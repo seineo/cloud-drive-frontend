@@ -6,6 +6,7 @@ import {SHA1} from 'crypto-js'
 import {error} from "@angular/compiler-cli/src/transformers/util";
 import {environment} from "../../environments/environment.development";
 import {Router} from "@angular/router";
+import {LoginService} from "../services/login.service";
 
 // import * as fs from 'fs'
 
@@ -35,16 +36,11 @@ export class SiteLayoutComponent implements OnInit {
   uploadProgress = 0.5
   uploadStatus = "running";
 
-  constructor(private fileService: FileService, private router: Router) {
-    const navigation = this.router.getCurrentNavigation();
-    this.state = navigation?.extras.state as {
-      data : string
-    }
+  constructor(private loginService: LoginService, private fileService: FileService, private router: Router) {
   }
 
   ngOnInit(): void {
-    // console.log("file hash: ", this.state.data);
-    this.fileService.getFilesMetadata(this.state.data).subscribe(data => {
+    this.fileService.getFilesMetadata(this.loginService.rootHash).subscribe(data => {
       this.files = data.files;
     });
   }
