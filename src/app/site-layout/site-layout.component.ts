@@ -30,6 +30,7 @@ export class SiteLayoutComponent implements OnInit {
   state: any;
   files: File[] = [];
   curDir = ["我的云盘"];
+  curDirHash = "";
   modelOpen = false;
   newDirName = "";
   showUploadToast = true;
@@ -40,9 +41,19 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fileService.getFilesMetadata(this.loginService.rootHash).subscribe(data => {
-      this.files = data.files;
-    });
+    let rootHash = this.loginService.rootHash;
+    // happens when front end restarts or crashes, so read from local storage
+    if (rootHash.length === 0) {
+      let hashKey = localStorage.getItem("rootHash") !== null;
+      if (hashKey) {
+        rootHash = localStorage.getItem("rootHash") as string;
+        this.fileService.getFilesMetadata(rootHash).subscribe(data => {
+          this.files = data.files;
+        });
+      } else {  // maybe user clear the local storage
+        this.router.navigate(['/login']);
+      }
+    }
   }
 
   truncateMiddle(word: string) {

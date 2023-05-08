@@ -23,7 +23,7 @@ export class FileService {
 
   // create file or directory
   uploadFile(dirPath: string, fileName: string, fileHash: string, fileType: string, file?: File): Observable<any> {
-    let url = environment.API_URL + "/api/v1/files/data/" + dirPath;
+    let url = environment.API_URL + "/api/v1/files/data";
     let formData = new FormData();
     let metadata = {
       "fileHash": fileHash,
