@@ -50,4 +50,9 @@ export class LoginService {
     };
     return this.http.post(url, payload, {withCredentials: true});
   }
+
+  logout(): Observable<any> {
+    let url = environment.API_URL + "/api/v1/sessions/current_session";
+    return this.http.delete(url, {withCredentials: true});
+  }
 }
