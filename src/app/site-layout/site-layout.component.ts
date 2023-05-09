@@ -30,7 +30,7 @@ export class SiteLayoutComponent implements OnInit {
   state: any;
   files: File[] = [];
   curDir = ["我的云盘"];
-  curDirHash = "";
+  curDirHash: string[] = [];  // 与curDir一一对应
   modelOpen = false;
   newDirName = "";
   showUploadToast = true;
@@ -54,6 +54,25 @@ export class SiteLayoutComponent implements OnInit {
         this.router.navigate(['/login']);
       }
     }
+    // // happens when front end restarts or crashes, so read from local storage
+    // this.loginService.getUserInfo().subscribe(
+    //   data => {
+    //     this.curUser = data.user;
+    //     let rootHash = data.user.rootHash;
+    //     this.curDirHash.push(rootHash);
+    //     this.fileService.getFilesMetadata(rootHash).subscribe(
+    //       data => {
+    //         this.files = data.files;
+    //       },
+    //       error => {
+    //         console.error(error);
+    //       }
+    //     )
+    //   },
+    //   error => {
+    //     console.error(error);
+    //   }
+    // )
   }
 
   truncateMiddle(word: string) {
@@ -71,17 +90,15 @@ export class SiteLayoutComponent implements OnInit {
 
 
   navigatePath(index: number) {
-    let dirPath = this.curDir[0];
-    for (let i = 1; i <= index; i++) {
-      dirPath = dirPath + "/" + this.curDir[i];
-    }
-    console.log("target dirPath:", dirPath)
-    this.fileService.getFilesMetadata(dirPath).subscribe(data => {
-      this.files = data.files;
-    });
     // 删除目标目录后的路径
     this.curDir.splice(index + 1);
+    this.curDirHash.splice(index + 1);
     console.log("after navigate, curDir:", this.curDir);
+    console.log("after navigate, curDirHash:", this.curDirHash);
+    // 跳转
+    this.fileService.getFilesMetadata(this.curDirHash[index]).subscribe(data => {
+      this.files = data.files;
+    });
   }
 
   getCurDir() {
@@ -92,13 +109,19 @@ export class SiteLayoutComponent implements OnInit {
     return dirPath;
   }
 
+  getCurDirHash() {
+    console.log("get curDirHash: ", this.curDirHash);
+    return this.curDirHash[this.curDirHash.length - 1];
+  }
+
   // 如果是文件夹，进入该文件夹；如果是文件，预览
   digFile(file: File) {
     if (file.FileType == "dir") {
+      // 更新当前文件夹信息
       this.curDir.push(file.Name);
-      let dirPath = this.getCurDir();
-      console.log("target dirPath:", dirPath)
-      this.fileService.getFilesMetadata(dirPath).subscribe(data => {
+      this.curDirHash.push(file.Hash);
+      // 跳转，更新当前文件夹下文件
+      this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(data => {
         this.files = data.files;
       });
     } else {
@@ -113,7 +136,7 @@ export class SiteLayoutComponent implements OnInit {
       data => {
         console.log("create dir:", data.file);
         // refresh current directory
-        this.fileService.getFilesMetadata(curDir).subscribe(data => {
+        this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(data => {
           this.files = data.files;
         });
       },
