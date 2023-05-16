@@ -1,10 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {from, map, mergeMap, Observable} from "rxjs";
 import {environment} from "../../environments/environment.development";
 import * as CryptoJS from 'crypto-js';
-import {resolve} from "@angular/compiler-cli";
-import {error} from "@angular/compiler-cli/src/transformers/util";
 
 
 @Injectable({
@@ -40,11 +38,9 @@ export class FileService {
     return this.http.post(url, formData, {withCredentials: true});
   }
 
-  downloadFile(dirPath: string, fileName: string): Observable<any> {
-    let url = environment.API_URL + "/api/v1/files/data/" + dirPath;
-    let queryParams = new HttpParams();
-    queryParams = queryParams.append("fileName", fileName);
-    return this.http.get(url, {params: queryParams, withCredentials: true});
+  downloadFile(fileHash: string){
+    let url = environment.API_URL + "/api/v1/files/data/" + fileHash;
+    return this.http.get(url, {withCredentials: true, responseType: "blob"});
   }
 
   // hash file using MD5 algorithm.

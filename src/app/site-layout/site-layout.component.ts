@@ -1,16 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {FileService} from "../services/file.service";
 import * as uuid from 'uuid';
-import {Form, NgForm} from "@angular/forms";
-import {SHA1} from 'crypto-js'
-import {error} from "@angular/compiler-cli/src/transformers/util";
+import {NgForm} from "@angular/forms";
 import {environment} from "../../environments/environment.development";
 import {Router} from "@angular/router";
 import {LoginService} from "../services/login.service";
-
+import { saveAs } from 'file-saver';
 // import * as fs from 'fs'
 
-interface File {
+interface MyFile {
   Hash: string,
   Name: string
   UserID: number
@@ -28,7 +26,7 @@ interface File {
 })
 export class SiteLayoutComponent implements OnInit {
   state: any;
-  files: File[] = [];
+  files: MyFile[] = [];
   curDir = ["我的云盘"];
   curDirHash: string[] = [];  // 与curDir一一对应
   modelOpen = false;
@@ -47,6 +45,7 @@ export class SiteLayoutComponent implements OnInit {
       let hashKey = localStorage.getItem("rootHash") !== null;
       if (hashKey) {
         rootHash = localStorage.getItem("rootHash") as string;
+        this.curDirHash.push(rootHash);
         this.fileService.getFilesMetadata(rootHash).subscribe(data => {
           this.files = data.files;
         });
@@ -54,25 +53,6 @@ export class SiteLayoutComponent implements OnInit {
         this.router.navigate(['/login']);
       }
     }
-    // // happens when front end restarts or crashes, so read from local storage
-    // this.loginService.getUserInfo().subscribe(
-    //   data => {
-    //     this.curUser = data.user;
-    //     let rootHash = data.user.rootHash;
-    //     this.curDirHash.push(rootHash);
-    //     this.fileService.getFilesMetadata(rootHash).subscribe(
-    //       data => {
-    //         this.files = data.files;
-    //       },
-    //       error => {
-    //         console.error(error);
-    //       }
-    //     )
-    //   },
-    //   error => {
-    //     console.error(error);
-    //   }
-    // )
   }
 
   truncateMiddle(word: string) {
@@ -115,7 +95,7 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   // 如果是文件夹，进入该文件夹；如果是文件，预览
-  digFile(file: File) {
+  digFile(file: MyFile) {
     if (file.FileType == "dir") {
       // 更新当前文件夹信息
       this.curDir.push(file.Name);
@@ -169,6 +149,7 @@ export class SiteLayoutComponent implements OnInit {
                 data => {
                   console.log("upload file:", fileName);
                   console.log("response after uploading:", data.file);
+                  window.location.reload();
                 },
                 error => {
                   console.error(error);
@@ -189,6 +170,7 @@ export class SiteLayoutComponent implements OnInit {
                     this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDir(), file.size).subscribe(
                       data => {
                         console.log("merged file chunks: ", data);
+                        window.location.reload();
                       },
                       error => {
                         console.error(error);
@@ -205,5 +187,17 @@ export class SiteLayoutComponent implements OnInit {
         }
       )
     }
+  }
+
+  download(file: MyFile) {
+    this.fileService.downloadFile(file.Hash).subscribe(
+      (resp) => {
+        console.log("downloaded file: ", file.Hash);
+        saveAs(resp, file.Name);
+      },
+      error => {
+        console.error(error);
+      }
+    )
   }
 }
