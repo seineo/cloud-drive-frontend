@@ -6,6 +6,8 @@ import {environment} from "../../environments/environment.development";
 import {Router} from "@angular/router";
 import {LoginService} from "../services/login.service";
 import {saveAs} from 'file-saver';
+import {from, mergeMap, Observable, throwError} from "rxjs";
+import {error} from "@angular/compiler-cli/src/transformers/util";
 
 // import * as fs from 'fs'
 
@@ -130,9 +132,25 @@ export class SiteLayoutComponent implements OnInit {
     console.log("selected event:", event);
     const files = (event.target as HTMLInputElement).files;
     if (files) {
-      let file = files[0];   // 先假定只有一个文件
-      let fileHash = await this.fileService.hashFile(file);
-      console.log("file hash: ", fileHash);
+      from(files).pipe(
+        mergeMap((file:File) => {
+          return this.uploadFile(file);
+        }, environment.CONCURRENT_LIMIT)
+      ).subscribe(
+        () => {
+          console.log("文件上传完毕");
+        },
+        error => {
+          console.error("文件上传出错： ", error);
+        }
+      );
+    }
+  }
+
+  async uploadFile(file: File): Promise<any> {
+    let fileHash = await this.fileService.hashFile(file);
+
+    return new Promise<string>((resolve, reject) => {
       // 使用hash查看是否有相同的文件，有则"秒传"
       // 没有相同文件则上传该文件
       this.fileService.fileExists(fileHash).subscribe(data => {
@@ -147,13 +165,15 @@ export class SiteLayoutComponent implements OnInit {
                 data => {
                   console.log("upload file:", fileName);
                   console.log("response after uploading:", data.file);
-                  window.location.reload();
+                  // window.location.reload();
+                  resolve(fileName);
                 },
                 error => {
-                  console.error(error);
+                  reject(error);
                 }
               )
             } else {  // 文件大于阈值，分块上传
+              console.log("分块上传！");
               this.fileService.uploadFileInChunks(file, fileHash).subscribe({
                   // 当前块处理成功
                   next: (result) => {
@@ -161,17 +181,18 @@ export class SiteLayoutComponent implements OnInit {
                   },
                   // 错误处理
                   error: (error) => {
-                    console.error(error);
+                    reject(error);
                   },
                   // 所有文件块上传完成，请求后端合并
                   complete: () => {
                     this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDir(), file.size).subscribe(
                       data => {
                         console.log("merged file chunks: ", data);
-                        window.location.reload();
+                        resolve(file.name);
+                        // window.location.reload();
                       },
                       error => {
-                        console.error(error);
+                        reject(error);
                       }
                     )
                   }
@@ -181,13 +202,14 @@ export class SiteLayoutComponent implements OnInit {
           }
         },
         error => {
-          console.error(error);
+          reject(error);
         }
-      )
-    }
+      );
+    });
+
   }
 
-  download(file: MyFile) {
+  downloadFile(file: MyFile) {
     this.fileService.downloadFile(file.Hash).subscribe(
       (resp) => {
         console.log("downloaded file: ", file.Hash);

@@ -60,7 +60,7 @@
         <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="digFile(file)">
           <clr-dg-action-overflow>
             <button class="action-item">预览</button>
-            <button class="action-item" (click)="download(file)">下载</button>
+            <button class="action-item" (click)="downloadFile(file)">下载</button>
             <button class="action-item">共享</button>
             <button class="action-item">星标</button>
             <button class="action-item">删除</button>
