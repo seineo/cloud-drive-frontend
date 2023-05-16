@@ -8,7 +8,6 @@ import * as uuid from 'uuid';
   providedIn: 'root'
 })
 export class LoginService {
-  rootHash = "";
   constructor(private http: HttpClient) {
   } // service使用了httpclient，那么就需要在app module导入HTTPClientModule！不然页面会变空白页
   sendAuthEmail(email: string): Observable<any> {
@@ -29,15 +28,15 @@ export class LoginService {
 
   signUp(name: string, email: string, password: string): Observable<any> {
     let url = environment.API_URL + "/api/v1/users";
-    this.rootHash = uuid.v4();
+    let rootHash = uuid.v4();
     // also store root directory hash in local storage,
     // in case that when front end crash user cannot get files under root directory
-    localStorage.setItem("rootHash", this.rootHash);
+    localStorage.setItem("rootHash", rootHash);
     let payload = {
       "name": name,
       "email": email,
       "password": password,
-      "rootHash": this.rootHash
+      "rootHash": rootHash
     };
     return this.http.post(url, payload, {withCredentials: true});
   }

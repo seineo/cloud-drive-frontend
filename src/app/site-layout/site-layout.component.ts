@@ -5,7 +5,8 @@ import {NgForm} from "@angular/forms";
 import {environment} from "../../environments/environment.development";
 import {Router} from "@angular/router";
 import {LoginService} from "../services/login.service";
-import { saveAs } from 'file-saver';
+import {saveAs} from 'file-saver';
+
 // import * as fs from 'fs'
 
 interface MyFile {
@@ -39,19 +40,16 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    let rootHash = this.loginService.rootHash;
     // happens when front end restarts or crashes, so read from local storage
-    if (rootHash.length === 0) {
-      let hashKey = localStorage.getItem("rootHash") !== null;
-      if (hashKey) {
-        rootHash = localStorage.getItem("rootHash") as string;
-        this.curDirHash.push(rootHash);
-        this.fileService.getFilesMetadata(rootHash).subscribe(data => {
-          this.files = data.files;
-        });
-      } else {  // maybe user clear the local storage
-        this.router.navigate(['/login']);
-      }
+    let hashKey = localStorage.getItem("rootHash") !== null;
+    if (hashKey) {
+      let rootHash = localStorage.getItem("rootHash") as string;
+      this.curDirHash.push(rootHash);
+      this.fileService.getFilesMetadata(rootHash).subscribe(data => {
+        this.files = data.files;
+      });
+    } else {  // maybe user clear the local storage
+      this.router.navigate(['/login']);
     }
   }
 

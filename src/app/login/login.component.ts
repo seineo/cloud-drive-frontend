@@ -25,7 +25,11 @@ export class LoginComponent {
   onLogin() {
     this.loginService.login(this.email, this.password).subscribe(
       data => {
-        console.log("user logged in:", data.user)
+        console.log("user logged in:", data.user);
+        // set rootHash in local storage
+        if (localStorage.getItem("rootHash") === null) {
+          localStorage.setItem("rootHash", data.user.rootHash);
+        }
         this.redirectHome()
       }
     )
