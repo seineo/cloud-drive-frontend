@@ -4,6 +4,11 @@ import {from, map, mergeMap, Observable} from "rxjs";
 import {environment} from "../../environments/environment.development";
 import * as CryptoJS from 'crypto-js';
 
+export interface UploadingFile {
+  Name: string,
+  Status: string,
+  Progress: number
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +40,7 @@ export class FileService {
       metadata["fileSize"] = file.size;
     }
     formData.append("metadata", JSON.stringify(metadata))
-    return this.http.post(url, formData, {withCredentials: true});
+    return this.http.post(url, formData, {withCredentials: true, reportProgress: true, observe: 'events'});
   }
 
   downloadFile(fileHash: string){

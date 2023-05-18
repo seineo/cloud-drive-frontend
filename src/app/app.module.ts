@@ -5,7 +5,8 @@ import { ClarityModule } from "@clr/angular";
 import '@cds/core/icon/register.js';
 import {
   ClarityIcons, cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon,
-  plusCircleIcon, shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon
+  plusCircleIcon, shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon,
+  windowCloseIcon, successStandardIcon
 } from '@cds/core/icon';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -21,7 +22,7 @@ import {AuthInterceptorService} from "./services/auth-interceptor.service";
 import { UpDownLoadComponent } from './up-down-load/up-down-load.component';
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
-  shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon);
+  shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon, windowCloseIcon, successStandardIcon);
 @NgModule({
   declarations: [
     AppComponent,

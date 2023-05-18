@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Router} from "@angular/router";
 import {LoginService} from "../services/login.service";
 import {error} from "@angular/compiler-cli/src/transformers/util";
+import {UploadingFile} from "../services/file.service";
 
 @Component({
   selector: 'app-header',
@@ -9,6 +10,8 @@ import {error} from "@angular/compiler-cli/src/transformers/util";
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
+  @Input() UploadingFiles!: Map<string, UploadingFile>;
+
   up_down_load_hidden = true;
   constructor(private router: Router, private loginService: LoginService) {
   }

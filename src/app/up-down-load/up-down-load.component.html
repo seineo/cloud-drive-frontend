@@ -7,8 +7,28 @@
         </button>
         <h3 class="modal-title">上传列表</h3>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" *ngIf="noData()">
        只展示本次上传的文件列表
+      </div>
+      <div class="modal-body" *ngIf="!noData()">
+        <div class="upload-progress">
+          <div *ngFor="let file of UploadingFiles | keyvalue" class="upload-item">
+            <div class="file-info">{{ file.key }}</div>
+            <div class="progress-bar">
+              <div class="progress" [style.width]="file.value.Progress + '%'"></div>
+            </div>
+
+<!--            <button class="cancel-button" *ngIf="file.value.Status !== 'Completed'" (click)="cancelUpload()">-->
+<!--              Cancel-->
+<!--            </button>-->
+            <div class="cancel-button" *ngIf="file.value.Status !== 'Completed'" (click)="cancelUpload()">
+              <cds-icon shape="window-close"></cds-icon>
+            </div>
+            <div class="success-button" *ngIf="file.value.Status === 'Completed'">
+              <cds-icon shape="success-standard"></cds-icon>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

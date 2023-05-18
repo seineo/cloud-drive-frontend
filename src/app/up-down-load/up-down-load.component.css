@@ -1,0 +1,50 @@
+.upload-progress {
+  padding: 10px;
+}
+
+.upload-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.file-info {
+  flex: 1;
+  max-width: 80px;
+}
+
+.progress-bar {
+  width: 60%;
+  height: 10px;
+  background-color: #e0e0e0;
+  margin-right: 10px;
+}
+
+.progress {
+  height: 100%;
+  background-color: hsl(198, 100%, 32%);
+}
+
+.status {
+  margin-right: 10px;
+}
+
+.cancel-button {
+  background-color: hsl(9, 92%, 50%);
+  margin-right: 10px;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.success-button {
+  background-color: hsl(93, 85%, 32%);
+  margin-right: 10px;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+}

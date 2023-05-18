@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {FileService} from "../services/file.service";
+import {FileService, UploadingFile} from "../services/file.service";
 import * as uuid from 'uuid';
 import {NgForm} from "@angular/forms";
 import {environment} from "../../environments/environment.development";
 import {Router} from "@angular/router";
 import {LoginService} from "../services/login.service";
 import {saveAs} from 'file-saver';
-import {from, mergeMap, Observable, throwError} from "rxjs";
-import {error} from "@angular/compiler-cli/src/transformers/util";
+import {from, mergeMap} from "rxjs";
+import {HttpEventType} from "@angular/common/http";
 
 // import * as fs from 'fs'
 
@@ -28,17 +28,24 @@ interface MyFile {
   styleUrls: ['./site-layout.component.css']
 })
 export class SiteLayoutComponent implements OnInit {
-  state: any;
   files: MyFile[] = [];
   curDir = ["我的云盘"];
   curDirHash: string[] = [];  // 与curDir一一对应
   modelOpen = false;
   newDirName = "";
-  showUploadToast = true;
-  uploadProgress = 0.5
-  uploadStatus = "running";
+  fileUploadingStatus: Map<string, UploadingFile> = new Map<string, UploadingFile>();  // map filename to uploading status
 
   constructor(private loginService: LoginService, private fileService: FileService, private router: Router) {
+    // this.fileUploadingStatus.set("test-file1", {
+    //   Name: "test-file1",
+    //   Status: "Waiting",
+    //   Progress: 40
+    // } as UploadingFile);
+    // this.fileUploadingStatus.set("test-file2test-file", {
+    //   Name: "test-file2",
+    //   Status: "Completed",
+    //   Progress: 80
+    // } as UploadingFile);
   }
 
   ngOnInit(): void {
@@ -94,6 +101,13 @@ export class SiteLayoutComponent implements OnInit {
     return this.curDirHash[this.curDirHash.length - 1];
   }
 
+  // 更新当前文件夹的文件列表
+  updateCurDir() {
+    this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(data => {
+      this.files = data.files;
+    });
+  }
+
   // 如果是文件夹，进入该文件夹；如果是文件，预览
   digFile(file: MyFile) {
     if (file.FileType == "dir") {
@@ -101,9 +115,7 @@ export class SiteLayoutComponent implements OnInit {
       this.curDir.push(file.Name);
       this.curDirHash.push(file.Hash);
       // 跳转，更新当前文件夹下文件
-      this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(data => {
-        this.files = data.files;
-      });
+      this.updateCurDir();
     } else {
       console.log("预览功能暂不支持");
       // TODO 增加预览功能
@@ -116,9 +128,7 @@ export class SiteLayoutComponent implements OnInit {
       data => {
         console.log("create dir:", data.file);
         // refresh current directory
-        this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(data => {
-          this.files = data.files;
-        });
+       this.updateCurDir();
       },
       error => {
         console.error(error);
@@ -149,6 +159,12 @@ export class SiteLayoutComponent implements OnInit {
 
   async uploadFile(file: File): Promise<any> {
     let fileHash = await this.fileService.hashFile(file);
+    // 初始化文件上传的状态
+    this.fileUploadingStatus.set(file.name, {
+      Name: file.name,
+      Status: "Waiting",
+      Progress: 0
+    } as UploadingFile);
 
     return new Promise<string>((resolve, reject) => {
       // 使用hash查看是否有相同的文件，有则"秒传"
@@ -156,18 +172,40 @@ export class SiteLayoutComponent implements OnInit {
       this.fileService.fileExists(fileHash).subscribe(data => {
           if (data.exist) { // 秒传
             console.log("秒传");
-            // TODO 秒传的前端显示效果
+            resolve(file.name);
+            // 秒传的效果：直接progress 100%
+            this.fileUploadingStatus.set(file.name, {
+              Name: file.name,
+              Status: "Completed",
+              Progress: 100
+            } as UploadingFile);
           } else { // 上传
             if (file.size < environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
               let curDir = this.getCurDir();
               let fileName = file.name;
               this.fileService.uploadFile(curDir, fileName, fileHash, file.type, file).subscribe(
-                data => {
-                  console.log("upload file:", fileName);
-                  console.log("response after uploading:", data.file);
-                  // window.location.reload();
-                  resolve(fileName);
+                resp => {
+                  if (resp.type === HttpEventType.Response) {
+                    console.log('Upload complete');
+                      this.updateCurDir();
+                      resolve(fileName);
+                  }
+                  if (resp.type === HttpEventType.UploadProgress) {
+                    const percentDone = Math.round(100 * resp.loaded / resp.total);
+                    console.log('Progress ' + percentDone + '%');
+                    this.fileUploadingStatus.set(file.name, {
+                      Name: file.name,
+                      Status: "Uploading",
+                      Progress: percentDone
+                    } as UploadingFile);
+                  }
                 },
+                // data => {
+                //   console.log("upload file:", fileName);
+                //   console.log("response after uploading:", data.file);
+                //   this.updateCurDir();
+                //   resolve(fileName);
+                // },
                 error => {
                   reject(error);
                 }
@@ -188,6 +226,7 @@ export class SiteLayoutComponent implements OnInit {
                     this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDir(), file.size).subscribe(
                       data => {
                         console.log("merged file chunks: ", data);
+                        this.updateCurDir();
                         resolve(file.name);
                         // window.location.reload();
                       },
