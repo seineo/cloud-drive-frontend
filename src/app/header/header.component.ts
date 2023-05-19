@@ -10,8 +10,8 @@ import {UploadingFile} from "../services/file.service";
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  @Input() UploadingFiles!: Map<string, UploadingFile>;
-
+  @Input() uploadingFiles!: Map<string, UploadingFile>;
+  @Input() uploadingNum!: number;
   up_down_load_hidden = true;
   constructor(private router: Router, private loginService: LoginService) {
   }
@@ -30,4 +30,6 @@ export class HeaderComponent {
       }
     );
   }
+
+
 }

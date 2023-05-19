@@ -1,7 +1,7 @@
 <!-- Site Layout -->
 <div class="main-container">
   <!-- Top Navigation -->
-  <app-header [UploadingFiles]="fileUploadingStatus"></app-header>
+  <app-header [uploadingFiles]="fileUploadingStatus" [uploadingNum]="uploadingNum"></app-header>
   <!-- Content -->
 
   <div class="content-container">
@@ -51,7 +51,7 @@
 
       <clr-datagrid>
         <!--        clrDGField binds model properties to columns-->
-        <clr-dg-column [clrDgField]="'Name'">文件名</clr-dg-column>
+        <clr-dg-column [clrDgField]="'Name'" class="table-file-name-column">文件名</clr-dg-column>
         <clr-dg-column [clrDgField]="'CreateTime'">创建时间</clr-dg-column>
         <clr-dg-column [clrDgField]="'Size'">大小</clr-dg-column>
         <!--        <clr-dg-column>操作</clr-dg-column>-->
@@ -66,7 +66,7 @@
             <button class="action-item">删除</button>
 
           </clr-dg-action-overflow>
-          <clr-dg-cell> {{truncateMiddle(file.Name)}} </clr-dg-cell>
+          <clr-dg-cell class="table-file-name"> {{ file.Name }} </clr-dg-cell>
           <clr-dg-cell> {{file.CreateTime }} </clr-dg-cell>
           <clr-dg-cell> {{file.Size}} </clr-dg-cell>
         </clr-dg-row>

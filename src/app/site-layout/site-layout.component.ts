@@ -34,6 +34,7 @@ export class SiteLayoutComponent implements OnInit {
   modelOpen = false;
   newDirName = "";
   fileUploadingStatus: Map<string, UploadingFile> = new Map<string, UploadingFile>();  // map filename to uploading status
+  uploadingNum = 0;
 
   constructor(private loginService: LoginService, private fileService: FileService, private router: Router) {
     // this.fileUploadingStatus.set("test-file1", {
@@ -141,6 +142,9 @@ export class SiteLayoutComponent implements OnInit {
   async onFileSelected(event: Event) {
     console.log("selected event:", event);
     const files = (event.target as HTMLInputElement).files;
+    // 清除上传信息
+    this.fileUploadingStatus.clear();
+    // 异步并发上传文件
     if (files) {
       from(files).pipe(
         mergeMap((file:File) => {
@@ -157,14 +161,24 @@ export class SiteLayoutComponent implements OnInit {
     }
   }
 
+  uploadCompleted(file: File) {
+    this.uploadingNum -= 1;
+    this.fileUploadingStatus.set(file.name, {
+      Name: file.name,
+      Status: "Completed",
+      Progress: 100
+    } as UploadingFile);
+  }
+
   async uploadFile(file: File): Promise<any> {
-    let fileHash = await this.fileService.hashFile(file);
     // 初始化文件上传的状态
+    this.uploadingNum += 1;
     this.fileUploadingStatus.set(file.name, {
       Name: file.name,
       Status: "Waiting",
       Progress: 0
     } as UploadingFile);
+    let fileHash = await this.fileService.hashFile(file);
 
     return new Promise<string>((resolve, reject) => {
       // 使用hash查看是否有相同的文件，有则"秒传"
@@ -172,13 +186,9 @@ export class SiteLayoutComponent implements OnInit {
       this.fileService.fileExists(fileHash).subscribe(data => {
           if (data.exist) { // 秒传
             console.log("秒传");
-            resolve(file.name);
             // 秒传的效果：直接progress 100%
-            this.fileUploadingStatus.set(file.name, {
-              Name: file.name,
-              Status: "Completed",
-              Progress: 100
-            } as UploadingFile);
+            this.uploadCompleted(file);
+            resolve(file.name);
           } else { // 上传
             if (file.size < environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
               let curDir = this.getCurDir();
@@ -187,8 +197,9 @@ export class SiteLayoutComponent implements OnInit {
                 resp => {
                   if (resp.type === HttpEventType.Response) {
                     console.log('Upload complete');
-                      this.updateCurDir();
-                      resolve(fileName);
+                    this.updateCurDir();
+                    this.uploadCompleted(file);
+                    resolve(fileName);
                   }
                   if (resp.type === HttpEventType.UploadProgress) {
                     const percentDone = Math.round(100 * resp.loaded / resp.total);
@@ -212,10 +223,20 @@ export class SiteLayoutComponent implements OnInit {
               )
             } else {  // 文件大于阈值，分块上传
               console.log("分块上传！");
+              const totalChunks = Math.ceil(file.size / environment.FILE_CHUNK_SIZE);
+              let chunkCount = 0;
               this.fileService.uploadFileInChunks(file, fileHash).subscribe({
                   // 当前块处理成功
                   next: (result) => {
                     console.log("uploaded a chunk: ", result);
+                    chunkCount += 1;
+                    const percentDone = Math.round(100 * chunkCount / totalChunks);
+                    console.log('Chunk Progress ' + percentDone + '%');
+                    this.fileUploadingStatus.set(file.name, {
+                      Name: file.name,
+                      Status: "Uploading",
+                      Progress: percentDone
+                    } as UploadingFile);
                   },
                   // 错误处理
                   error: (error) => {
@@ -227,6 +248,7 @@ export class SiteLayoutComponent implements OnInit {
                       data => {
                         console.log("merged file chunks: ", data);
                         this.updateCurDir();
+                        this.uploadCompleted(file);
                         resolve(file.name);
                         // window.location.reload();
                       },

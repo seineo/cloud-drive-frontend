@@ -2,11 +2,11 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {UploadingFile} from "../services/file.service";
 
 @Component({
-  selector: 'app-up-down-load',
-  templateUrl: './up-down-load.component.html',
-  styleUrls: ['./up-down-load.component.css']
+  selector: 'app-upload-list',
+  templateUrl: './upload-list.component.html',
+  styleUrls: ['./upload-list.component.css']
 })
-export class UpDownLoadComponent {
+export class UploadListComponent {
   @Input() UploadingFiles!: Map<string, UploadingFile>;
   @Input() modalHidden: boolean | undefined;
   @Output() modalHiddenChange = new EventEmitter<boolean>();

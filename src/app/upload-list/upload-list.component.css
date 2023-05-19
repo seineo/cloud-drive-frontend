@@ -11,7 +11,10 @@
 
 .file-info {
   flex: 1;
-  max-width: 80px;
+  max-width: 25%;
+/* 由于容器大小问题 文本过长还是会溢出，所以选择隐藏溢出的部分，用省略号代替 */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .progress-bar {

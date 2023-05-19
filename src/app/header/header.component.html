@@ -15,8 +15,8 @@
       <cds-icon class="icon" shape="upload-cloud"></cds-icon>
     </a>
 <!--    show number of uploading files-->
-    <span class="badge badge-purple" style="margin-top: 10px; margin-left: -10px" *ngIf="UploadingFiles.size !== 0">
-      {{UploadingFiles.size}}
+    <span class="badge badge-purple" style="margin-top: 10px; margin-left: -10px" *ngIf="uploadingNum !== 0">
+      {{uploadingNum}}
     </span>
 
 
@@ -34,5 +34,5 @@
   </div>
 </header>
 
-<app-up-down-load [hidden]="up_down_load_hidden" [(modalHidden)]="up_down_load_hidden"
-                  [UploadingFiles]="UploadingFiles"></app-up-down-load>
+<app-upload-list [hidden]="up_down_load_hidden" [(modalHidden)]="up_down_load_hidden"
+                 [UploadingFiles]="uploadingFiles"></app-upload-list>

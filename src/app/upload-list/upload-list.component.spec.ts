@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UpDownLoadComponent } from './up-down-load.component';
+import { UploadListComponent } from './upload-list.component';
 
 describe('UpDownLoadComponent', () => {
-  let component: UpDownLoadComponent;
-  let fixture: ComponentFixture<UpDownLoadComponent>;
+  let component: UploadListComponent;
+  let fixture: ComponentFixture<UploadListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UpDownLoadComponent ]
+      declarations: [ UploadListComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(UpDownLoadComponent);
+    fixture = TestBed.createComponent(UploadListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

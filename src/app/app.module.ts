@@ -19,7 +19,7 @@ import { SignUpComponent } from './sign-up/sign-up.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import {AuthInterceptorService} from "./services/auth-interceptor.service";
-import { UpDownLoadComponent } from './up-down-load/up-down-load.component';
+import { UploadListComponent } from './upload-list/upload-list.component';
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
   shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon, windowCloseIcon, successStandardIcon);
@@ -31,7 +31,7 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
     LoginComponent,
     SignUpComponent,
     PageNotFoundComponent,
-    UpDownLoadComponent,
+    UploadListComponent,
   ],
     imports: [
         BrowserModule,

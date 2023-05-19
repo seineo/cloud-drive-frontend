@@ -76,3 +76,13 @@ nav {
 a:hover {
   cursor: pointer;
 }
+
+.table-file-name-column {
+  max-width: 60%;
+}
+
+.table-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+}
