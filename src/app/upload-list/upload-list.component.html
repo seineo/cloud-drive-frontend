@@ -17,10 +17,6 @@
             <div class="progress-bar">
               <div class="progress" [style.width]="file.value.progress + '%'"></div>
             </div>
-
-<!--            <button class="cancel-button" *ngIf="file.value.Status !== 'Completed'" (click)="cancelUpload()">-->
-<!--              Cancel-->
-<!--            </button>-->
             <div class="cancel-button" *ngIf="file.value.status !== StatusEnum.COMPLETED" (click)="cancelUpload()">
               <cds-icon shape="window-close"></cds-icon>
             </div>

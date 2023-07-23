@@ -9,6 +9,7 @@ import {saveAs} from 'file-saver';
 import {from, mergeMap} from "rxjs";
 import {HttpEventType} from "@angular/common/http";
 import {MyDir, MyFile, UploadingFile, UploadingStatus} from "../file.model";
+import {error} from "@angular/compiler-cli/src/transformers/util";
 
 // import * as fs from 'fs'
 
@@ -170,6 +171,7 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   async uploadFile(file: File): Promise<any> {
+    // TODO 文件大小大于上限则不允许上传
     // 初始化文件上传的状态
     this.uploadingNum += 1;
     this.fileUploadingStatus.set(file.name, {
@@ -219,37 +221,55 @@ export class SiteLayoutComponent implements OnInit {
             } else {  // 文件大于阈值，分块上传
               console.log("分块上传！");
               const totalChunks = Math.ceil(file.size / environment.FILE_CHUNK_SIZE);
-              let chunkCount = 0;
-              this.fileService.uploadFileInChunks(file, fileHash).subscribe({
-                  // 当前块处理成功
-                  next: (result) => {
-                    console.log("uploaded a chunk: ", result);
-                    chunkCount += 1;
-                    const percentDone = Math.round(100 * chunkCount / totalChunks);
-                    console.log('Chunk Progress ' + percentDone + '%');
+              // 分片上传前先获取未上传的分块列表
+              this.fileService.getMissedChunks(fileHash).subscribe(
+                data => {
+                  let chunkCount = 0;
+                  let chunkIndexes = Array.from({length: totalChunks}, (_, i) => i);
+                  if (data.exists) { // 只上传缺失的文件块
+                    // 接上 上次的上传进度条
+                    console.log("missed chunks: ", data.missedChunks);
+                    chunkCount = totalChunks - data.missedChunks.length;
+                    chunkIndexes = data.missedChunks;
+                    let percentDone = Math.round(100 * chunkCount / totalChunks)
                     this.uploadProgressing(file, percentDone);
-                  },
-                  // 错误处理
-                  error: (error) => {
-                    reject(error);
-                  },
-                  // 所有文件块上传完成，请求后端合并
-                  complete: () => {
-                    this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDirHash(), file.size).subscribe(
-                      data => {
-                        console.log("merged file chunks: ", data);
-                        this.updateCurDir();
-                        this.uploadCompleted(file);
-                        resolve(file.name);
-                        // window.location.reload();
-                      },
-                      error => {
-                        reject(error);
-                      }
-                    )
                   }
+                  this.fileService.uploadFileInChunks(file, fileHash, totalChunks, chunkIndexes).subscribe({
+                      // 当前块处理成功
+                      next: (result) => {
+                        console.log("uploaded a chunk: ", result);
+                        chunkCount += 1;
+                        const percentDone = Math.round(100 * chunkCount / totalChunks);
+                        console.log('Chunk Progress ' + percentDone + '%');
+                        this.uploadProgressing(file, percentDone);
+                      },
+                      // 错误处理
+                      error: (error) => {
+                        reject(error);
+                      },
+                      // 所有文件块上传完成，请求后端合并
+                      complete: () => {
+                        this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDirHash(), file.size).subscribe(
+                          data => {
+                            console.log("merged file chunks: ", data);
+                            this.updateCurDir();
+                            this.uploadCompleted(file);
+                            resolve(file.name);
+                            // window.location.reload();
+                          },
+                          error => {
+                            reject(error);
+                          }
+                        );
+                      }
+                    }
+                  );
+                },
+                error => {
+                  console.error(error);
                 }
               )
+
             }
           }
         },
@@ -288,7 +308,7 @@ export class SiteLayoutComponent implements OnInit {
 
   cancelModal(modalForm: NgForm) {
     this.modelOpen = false;
-    modalForm.resetForm();
+    modalForm.resetForm();  // 重置表单，因此再次打开表单不会因为空输入而报错
     this.newDirName = "";
   }
 }

@@ -44,11 +44,11 @@ export class FileService {
     };
     console.log("metadata: ", metadata);
     formData.append("file", file);
-    formData.append("metadata", JSON.stringify(metadata))
+    formData.append("metadata", JSON.stringify(metadata));
     return this.http.post(url, formData, {withCredentials: true, reportProgress: true, observe: 'events'});
   }
 
-  downloadFile(fileHash: string){
+  downloadFile(fileHash: string) {
     let url = this.host + "/api/v1/files/file/" + fileHash;
     return this.http.get(url, {withCredentials: true, responseType: "blob"});
   }
@@ -112,37 +112,28 @@ export class FileService {
   uploadChunk(fileHash: string, chunkHash: string, index: number, totalChunks: number, blob: Blob): Observable<any> {
     return new Observable<any>((observer) => {
       let url = this.host + "/api/v1/files/chunks";
-      let fileReader = new FileReader();
-      fileReader.readAsArrayBuffer(blob);
-      let base64 = "";
-      fileReader.onload = () => {
-        // convert blob object to base64-encoded string
-        const buffer = fileReader.result as ArrayBuffer;
-        base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-        let payload = {
-          "fileHash": fileHash,
-          "chunkHash": chunkHash,
-          "index": index,
-          "totalChunks": totalChunks,
-          "blob": base64,
-        };
-        console.log("payload:", payload);
-        this.http.post(url, payload, {withCredentials: true}).subscribe(
-          (response) => {
-            observer.next(response);
-            observer.complete();
-          },
-          (error) => {
-            observer.error(error);
-          }
-        );
-      }
+      let metadata = {
+        "fileHash": fileHash,
+        "chunkHash": chunkHash,
+        "index": index,
+        "totalChunks": totalChunks,
+      };
+      let formData = new FormData();
+      formData.append("metadata", JSON.stringify(metadata));
+      formData.append("chunk", blob);
+      this.http.post(url, formData, {withCredentials: true}).subscribe(
+        (response) => {
+          observer.next(response);
+          observer.complete();
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
     });
   }
 
-  uploadFileInChunks(file: File, fileHash: string): Observable<any> {
-    const totalChunks = Math.ceil(file.size / environment.FILE_CHUNK_SIZE);
-    const chunkIndexes = Array.from({length: totalChunks}, (_, i) => i);
+  uploadFileInChunks(file: File, fileHash: string, totalChunks: number, chunkIndexes: number[]): Observable<any> {
     console.log("chunk indexes: ", chunkIndexes);
     return from(chunkIndexes).pipe(
       // 计算每块的哈希值
@@ -151,7 +142,6 @@ export class FileService {
         const start = index * environment.FILE_CHUNK_SIZE;
         const end = Math.min(start + environment.FILE_CHUNK_SIZE, file.size);
         const blob = file.slice(start, end);
-
         return from(this.hashChunk(blob)).pipe(
           map((hash) => ({index, blob, hash})),
         );
@@ -163,6 +153,7 @@ export class FileService {
     );
   }
 
+
   mergeFileChunks(fileHash: string, fileName: string, fileType: string, dirHash: string, fileSize: number): Observable<any> {
     let url = this.host + "/api/v1/files/chunks/" + fileHash;
     let payload = {
@@ -173,5 +164,10 @@ export class FileService {
       "fileSize": fileSize
     }
     return this.http.post(url, payload, {withCredentials: true});
+  }
+
+  getMissedChunks(fileHash: string): Observable<any> {
+    let url = this.host + "/api/v1/files/chunks/" + fileHash;
+    return this.http.get(url, {withCredentials:true});
   }
 }

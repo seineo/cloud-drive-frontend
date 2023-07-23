@@ -24,6 +24,6 @@ export class UploadListComponent {
 
 
   cancelUpload() {
-
+    console.log("取消上传！");
   }
 }
