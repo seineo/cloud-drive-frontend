@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Router} from "@angular/router";
 import {LoginService} from "../services/login.service";
 import {error} from "@angular/compiler-cli/src/transformers/util";
-import {UploadingFile} from "../services/file.service";
+import {UploadingFile} from "../file.model";
 
 @Component({
   selector: 'app-header',

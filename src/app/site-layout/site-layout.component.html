@@ -57,7 +57,8 @@
         <!--        <clr-dg-column>操作</clr-dg-column>-->
         <clr-dg-placeholder>这里空空如也</clr-dg-placeholder>
 
-        <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="digFile(file)">
+
+        <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="onDoubleClick(file)">
           <clr-dg-action-overflow>
             <button class="action-item">预览</button>
             <button class="action-item" (click)="downloadFile(file)">下载</button>
@@ -66,9 +67,9 @@
             <button class="action-item">删除</button>
 
           </clr-dg-action-overflow>
-          <clr-dg-cell class="table-file-name"> {{ file.Name }} </clr-dg-cell>
-          <clr-dg-cell> {{file.CreateTime }} </clr-dg-cell>
-          <clr-dg-cell> {{file.Size}} </clr-dg-cell>
+          <clr-dg-cell class="table-file-name"> {{ file.name }} </clr-dg-cell>
+          <clr-dg-cell> {{file.createdAt }} </clr-dg-cell>
+          <clr-dg-cell> {{file.size}} </clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
@@ -99,7 +100,7 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="modelOpen = false">取消</button>
+    <button type="button" class="btn btn-outline" (click)="cancelModal(modalForm)">取消</button>
     <button type="button" class="btn btn-primary" (click)="createDir(modalForm)" [disabled]="!modalForm.valid">确认
     </button>
   </div>

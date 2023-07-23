@@ -3,48 +3,53 @@ import {HttpClient} from "@angular/common/http";
 import {from, map, mergeMap, Observable} from "rxjs";
 import {environment} from "../../environments/environment.development";
 import * as CryptoJS from 'crypto-js';
-
-export interface UploadingFile {
-  Name: string,
-  Status: string,
-  Progress: number
-}
+import {DirRequest, FileRequest} from "../file.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileService {
+  private readonly host: string = environment.API_URL
 
   constructor(private http: HttpClient) {
+
   }
 
   // dirPath should start without slash
-  getFilesMetadata(fileHash: string): Observable<any> {
-    let url = environment.API_URL + "/api/v1/files/metadata/" + fileHash;
+  getFilesMetadata(dirHash: string): Observable<any> {
+    let url = this.host + "/api/v1/files/metadata/dir/" + dirHash;
     return this.http.get(url, {withCredentials: true});
   }
 
-  // create file or directory
-  uploadFile(dirPath: string, fileName: string, fileHash: string, fileType: string, file?: File): Observable<any> {
-    let url = environment.API_URL + "/api/v1/files/data";
-    let formData = new FormData();
-    let metadata = {
-      "fileHash": fileHash,
-      "fileName": fileName,
-      "fileType": fileType,
-      "dirPath": dirPath,
-      "fileSize": 0
-    };
-    if (file) {
-      formData.append("file", file);
-      metadata["fileSize"] = file.size;
+  createDir(hash: string, name: string, dirHash: string): Observable<any> {
+    let url = this.host + "/api/v1/files/dir";
+    let payload: DirRequest = {
+      hash: hash,
+      name: name,
+      dirHash: dirHash
     }
+    return this.http.post(url, payload, {withCredentials: true})
+  }
+
+  // upload a single file
+  uploadFile(dirHash: string, fileName: string, fileHash: string, fileType: string, file: File): Observable<any> {
+    let url = this.host + "/api/v1/files/file";
+    let formData = new FormData();
+    let metadata: FileRequest = {
+      fileHash: fileHash,
+      fileName: fileName,
+      fileType: fileType,
+      dirHash: dirHash,
+      fileSize: file.size,
+    };
+    console.log("metadata: ", metadata);
+    formData.append("file", file);
     formData.append("metadata", JSON.stringify(metadata))
     return this.http.post(url, formData, {withCredentials: true, reportProgress: true, observe: 'events'});
   }
 
   downloadFile(fileHash: string){
-    let url = environment.API_URL + "/api/v1/files/data/" + fileHash;
+    let url = this.host + "/api/v1/files/file/" + fileHash;
     return this.http.get(url, {withCredentials: true, responseType: "blob"});
   }
 
@@ -84,7 +89,7 @@ export class FileService {
 
 
   fileExists(hash: string): Observable<any> {
-    let url = environment.API_URL + "/api/v1/files/hash/" + hash;
+    let url = this.host + "/api/v1/files/metadata/file/" + hash;
     return this.http.get(url, {withCredentials: true});
   }
 
@@ -106,7 +111,7 @@ export class FileService {
 
   uploadChunk(fileHash: string, chunkHash: string, index: number, totalChunks: number, blob: Blob): Observable<any> {
     return new Observable<any>((observer) => {
-      let url = environment.API_URL + "/api/v1/files/chunks";
+      let url = this.host + "/api/v1/files/chunks";
       let fileReader = new FileReader();
       fileReader.readAsArrayBuffer(blob);
       let base64 = "";
@@ -158,13 +163,13 @@ export class FileService {
     );
   }
 
-  mergeFileChunks(fileHash: string, fileName: string, fileType: string, dirPath: string, fileSize: number): Observable<any> {
-    let url = environment.API_URL + "/api/v1/files/chunks/" + fileHash;
+  mergeFileChunks(fileHash: string, fileName: string, fileType: string, dirHash: string, fileSize: number): Observable<any> {
+    let url = this.host + "/api/v1/files/chunks/" + fileHash;
     let payload = {
       "fileHash": fileHash,
       "fileName": fileName,
       "fileType": fileType,
-      "dirPath": dirPath,
+      "dirHash": dirHash,
       "fileSize": fileSize
     }
     return this.http.post(url, payload, {withCredentials: true});

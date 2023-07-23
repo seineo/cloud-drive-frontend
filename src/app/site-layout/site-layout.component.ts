@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {FileService, UploadingFile} from "../services/file.service";
-import * as uuid from 'uuid';
+import {FileService} from "../services/file.service";
+import {v4 as uuid} from 'uuid';
 import {NgForm} from "@angular/forms";
 import {environment} from "../../environments/environment.development";
 import {Router} from "@angular/router";
@@ -8,19 +8,9 @@ import {LoginService} from "../services/login.service";
 import {saveAs} from 'file-saver';
 import {from, mergeMap} from "rxjs";
 import {HttpEventType} from "@angular/common/http";
+import {MyDir, MyFile, UploadingFile, UploadingStatus} from "../file.model";
 
 // import * as fs from 'fs'
-
-interface MyFile {
-  Hash: string,
-  Name: string
-  UserID: number
-  FileType: string // dir, pdf, img, video...
-  Size: number
-  DirPath: string // virtual directory path shown for users
-  Location: string // real file storage path
-  CreateTime: string
-}
 
 @Component({
   selector: 'app-site-layout',
@@ -29,6 +19,7 @@ interface MyFile {
 })
 export class SiteLayoutComponent implements OnInit {
   files: MyFile[] = [];
+  dirs: MyDir[] = [];
   curDir = ["我的云盘"];
   curDirHash: string[] = [];  // 与curDir一一对应
   modelOpen = false;
@@ -53,11 +44,12 @@ export class SiteLayoutComponent implements OnInit {
     // happens when front end restarts or crashes, so read from local storage
     let hashKey = localStorage.getItem("rootHash") !== null;
     if (hashKey) {
+      console.log("get local stored root hash");
       let rootHash = localStorage.getItem("rootHash") as string;
+      console.log("root hash: ", rootHash);
       this.curDirHash.push(rootHash);
-      this.fileService.getFilesMetadata(rootHash).subscribe(data => {
-        this.files = data.files;
-      });
+      this.updateCurDir();
+      console.log("files: ", this.files);
     } else {  // maybe user clear the local storage
       this.router.navigate(['/login']);
     }
@@ -84,12 +76,10 @@ export class SiteLayoutComponent implements OnInit {
     console.log("after navigate, curDir:", this.curDir);
     console.log("after navigate, curDirHash:", this.curDirHash);
     // 跳转
-    this.fileService.getFilesMetadata(this.curDirHash[index]).subscribe(data => {
-      this.files = data.files;
-    });
+    this.updateCurDir();
   }
 
-  getCurDir() {
+  getCurDirPath() {
     let dirPath = this.curDir[0];
     for (let i = 1; i < this.curDir.length; i++) {
       dirPath = dirPath + "/" + this.curDir[i];
@@ -98,38 +88,39 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   getCurDirHash() {
-    console.log("get curDirHash: ", this.curDirHash);
     return this.curDirHash[this.curDirHash.length - 1];
   }
 
   // 更新当前文件夹的文件列表
   updateCurDir() {
-    this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(data => {
-      this.files = data.files;
-    });
+    console.log("cur dir hash:", this.getCurDirHash());
+    this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(
+      data => {
+        this.files = data.files;
+      },
+      error => {
+        console.log("failed to find locally stored root hash on server");
+        this.router.navigate(['/login']);
+      });
   }
 
   // 如果是文件夹，进入该文件夹；如果是文件，预览
-  digFile(file: MyFile) {
-    if (file.FileType == "dir") {
-      // 更新当前文件夹信息
-      this.curDir.push(file.Name);
-      this.curDirHash.push(file.Hash);
-      // 跳转，更新当前文件夹下文件
-      this.updateCurDir();
-    } else {
-      console.log("预览功能暂不支持");
-      // TODO 增加预览功能
-    }
+  digDir(dir: MyFile) {
+    // 更新当前文件夹信息
+    this.curDir.push(dir.name);
+    this.curDirHash.push(dir.hash);
+    // 跳转，更新当前文件夹下文件
+    this.updateCurDir();
   }
 
   createDir(form: NgForm) {
-    let curDir = this.getCurDir();
-    this.fileService.uploadFile(curDir, this.newDirName, uuid.v4(), "dir").subscribe(
+    let hash: string = uuid();
+    console.log("form:", form.value.name)
+    this.fileService.createDir(hash, form.value.name as string, this.getCurDirHash()).subscribe(
       data => {
-        console.log("create dir:", data.file);
+        console.log("create dir:", data.dir);
         // refresh current directory
-       this.updateCurDir();
+        this.updateCurDir();
       },
       error => {
         console.error(error);
@@ -147,7 +138,7 @@ export class SiteLayoutComponent implements OnInit {
     // 异步并发上传文件
     if (files) {
       from(files).pipe(
-        mergeMap((file:File) => {
+        mergeMap((file: File) => {
           return this.uploadFile(file);
         }, environment.CONCURRENT_LIMIT)
       ).subscribe(
@@ -164,9 +155,17 @@ export class SiteLayoutComponent implements OnInit {
   uploadCompleted(file: File) {
     this.uploadingNum -= 1;
     this.fileUploadingStatus.set(file.name, {
-      Name: file.name,
-      Status: "Completed",
-      Progress: 100
+      name: file.name,
+      status: UploadingStatus.COMPLETED,
+      progress: 100
+    } as UploadingFile);
+  }
+
+  uploadProgressing(file: File, percent: number) {
+    this.fileUploadingStatus.set(file.name, {
+      name: file.name,
+      status: UploadingStatus.UPLOADING,
+      progress: percent
     } as UploadingFile);
   }
 
@@ -174,9 +173,9 @@ export class SiteLayoutComponent implements OnInit {
     // 初始化文件上传的状态
     this.uploadingNum += 1;
     this.fileUploadingStatus.set(file.name, {
-      Name: file.name,
-      Status: "Waiting",
-      Progress: 0
+      name: file.name,
+      status: UploadingStatus.WAITING,
+      progress: 0
     } as UploadingFile);
     let fileHash = await this.fileService.hashFile(file);
 
@@ -184,19 +183,25 @@ export class SiteLayoutComponent implements OnInit {
       // 使用hash查看是否有相同的文件，有则"秒传"
       // 没有相同文件则上传该文件
       this.fileService.fileExists(fileHash).subscribe(data => {
+          let dirHash = this.getCurDirHash();
+          let fileName = file.name;
           if (data.exist) { // 秒传
             console.log("秒传");
             // 秒传的效果：直接progress 100%
+            this.fileService.uploadFile(dirHash, fileName, fileHash, file.type, file).subscribe(
+              data => {
+                console.log("create entry for existed file:", data.file);
+                this.updateCurDir();
+              }
+            )
             this.uploadCompleted(file);
             resolve(file.name);
           } else { // 上传
             if (file.size < environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
-              let curDir = this.getCurDir();
-              let fileName = file.name;
-              this.fileService.uploadFile(curDir, fileName, fileHash, file.type, file).subscribe(
+              this.fileService.uploadFile(dirHash, fileName, fileHash, file.type, file).subscribe(
                 resp => {
                   if (resp.type === HttpEventType.Response) {
-                    console.log('Upload complete');
+                    console.log('Upload completed');
                     this.updateCurDir();
                     this.uploadCompleted(file);
                     resolve(fileName);
@@ -204,23 +209,13 @@ export class SiteLayoutComponent implements OnInit {
                   if (resp.type === HttpEventType.UploadProgress) {
                     const percentDone = Math.round(100 * resp.loaded / resp.total);
                     console.log('Progress ' + percentDone + '%');
-                    this.fileUploadingStatus.set(file.name, {
-                      Name: file.name,
-                      Status: "Uploading",
-                      Progress: percentDone
-                    } as UploadingFile);
+                    this.uploadProgressing(file, percentDone);
                   }
                 },
-                // data => {
-                //   console.log("upload file:", fileName);
-                //   console.log("response after uploading:", data.file);
-                //   this.updateCurDir();
-                //   resolve(fileName);
-                // },
                 error => {
                   reject(error);
                 }
-              )
+              );
             } else {  // 文件大于阈值，分块上传
               console.log("分块上传！");
               const totalChunks = Math.ceil(file.size / environment.FILE_CHUNK_SIZE);
@@ -232,11 +227,7 @@ export class SiteLayoutComponent implements OnInit {
                     chunkCount += 1;
                     const percentDone = Math.round(100 * chunkCount / totalChunks);
                     console.log('Chunk Progress ' + percentDone + '%');
-                    this.fileUploadingStatus.set(file.name, {
-                      Name: file.name,
-                      Status: "Uploading",
-                      Progress: percentDone
-                    } as UploadingFile);
+                    this.uploadProgressing(file, percentDone);
                   },
                   // 错误处理
                   error: (error) => {
@@ -244,7 +235,7 @@ export class SiteLayoutComponent implements OnInit {
                   },
                   // 所有文件块上传完成，请求后端合并
                   complete: () => {
-                    this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDir(), file.size).subscribe(
+                    this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDirHash(), file.size).subscribe(
                       data => {
                         console.log("merged file chunks: ", data);
                         this.updateCurDir();
@@ -270,15 +261,34 @@ export class SiteLayoutComponent implements OnInit {
 
   }
 
+  downloadDir(dir: MyDir) {
+
+  }
+
   downloadFile(file: MyFile) {
-    this.fileService.downloadFile(file.Hash).subscribe(
+    this.fileService.downloadFile(file.hash).subscribe(
       (resp) => {
-        console.log("downloaded file: ", file.Hash);
-        saveAs(resp, file.Name);
+        console.log("downloaded file: ", file.hash);
+        saveAs(resp, file.name);
       },
       error => {
         console.error(error);
       }
     )
+  }
+
+  onDoubleClick(file: MyFile) {
+    if (file.type == "dir") {
+      this.digDir(file);
+    } else {
+      // TODO 支持预览
+      console.log("预览暂时不支持")
+    }
+  }
+
+  cancelModal(modalForm: NgForm) {
+    this.modelOpen = false;
+    modalForm.resetForm();
+    this.newDirName = "";
   }
 }

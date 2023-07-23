@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {UploadingFile} from "../services/file.service";
+import {UploadingFile, UploadingStatus} from "../file.model";
 
 @Component({
   selector: 'app-upload-list',
@@ -10,6 +10,7 @@ export class UploadListComponent {
   @Input() UploadingFiles!: Map<string, UploadingFile>;
   @Input() modalHidden: boolean | undefined;
   @Output() modalHiddenChange = new EventEmitter<boolean>();
+  StatusEnum = UploadingStatus
 
   closeModal() {
     this.modalHidden = true;

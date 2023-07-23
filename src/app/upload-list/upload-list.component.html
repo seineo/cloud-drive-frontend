@@ -15,16 +15,16 @@
           <div *ngFor="let file of UploadingFiles | keyvalue" class="upload-item">
             <div class="file-info">{{ file.key }}</div>
             <div class="progress-bar">
-              <div class="progress" [style.width]="file.value.Progress + '%'"></div>
+              <div class="progress" [style.width]="file.value.progress + '%'"></div>
             </div>
 
 <!--            <button class="cancel-button" *ngIf="file.value.Status !== 'Completed'" (click)="cancelUpload()">-->
 <!--              Cancel-->
 <!--            </button>-->
-            <div class="cancel-button" *ngIf="file.value.Status !== 'Completed'" (click)="cancelUpload()">
+            <div class="cancel-button" *ngIf="file.value.status !== StatusEnum.COMPLETED" (click)="cancelUpload()">
               <cds-icon shape="window-close"></cds-icon>
             </div>
-            <div class="success-button" *ngIf="file.value.Status === 'Completed'">
+            <div class="success-button" *ngIf="file.value.status === StatusEnum.COMPLETED">
               <cds-icon shape="success-standard"></cds-icon>
             </div>
           </div>

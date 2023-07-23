@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {LoginService} from "../services/login.service";
 import {Router} from "@angular/router";
+import {error} from "@angular/compiler-cli/src/transformers/util";
 
 @Component({
   selector: 'app-login',
@@ -31,6 +32,10 @@ export class LoginComponent {
           localStorage.setItem("rootHash", data.user.rootHash);
         }
         this.redirectHome()
+      },
+      error => {
+        this.errorHidden = false;
+
       }
     )
   }
