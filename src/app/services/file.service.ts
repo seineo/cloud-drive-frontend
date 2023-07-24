@@ -148,7 +148,7 @@ export class FileService {
       }, environment.CONCURRENT_LIMIT),
       // 上传文件块
       mergeMap(({index, blob, hash}) => {
-        return this.uploadChunk(fileHash, hash, index + 1, totalChunks, blob);
+        return this.uploadChunk(fileHash, hash, index, totalChunks, blob);
       }, environment.CONCURRENT_LIMIT),
     );
   }
