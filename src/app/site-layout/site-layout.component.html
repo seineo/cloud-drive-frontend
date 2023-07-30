@@ -68,9 +68,16 @@
 
           </clr-dg-action-overflow>
           <clr-dg-cell class="table-file-name">
-            <cds-icon shape="folder" *ngIf="file.type === 'dir'"></cds-icon>
-            <cds-icon shape="file-zip" *ngIf="file.type === 'application/zip'"></cds-icon>
-            <cds-icon shape="file" *ngIf="file.type !== 'dir' &&file.type !== 'application/zip'"></cds-icon>
+            <ng-container [ngSwitch]="getFileIconType(file)">
+              <cds-icon *ngSwitchCase="'application/pdf'" shape="pdf-file" solid></cds-icon>
+              <cds-icon *ngSwitchCase="'image'" shape="image"></cds-icon>
+              <cds-icon *ngSwitchCase="'video'" shape="video-camera"></cds-icon>
+              <cds-icon *ngSwitchCase="'zip'" shape="file-zip"></cds-icon>
+              <cds-icon *ngSwitchCase="'dir'" shape="folder"></cds-icon>
+              <cds-icon *ngSwitchDefault shape="file"></cds-icon>
+            </ng-container>
+<!--            <cds-icon shape="file-zip" *ngIf="file.type === 'application/zip'"></cds-icon>-->
+<!--            <cds-icon shape="file" *ngIf="file.type !== 'dir' &&file.type !== 'application/zip'"></cds-icon>-->
             {{ file.name }}
           </clr-dg-cell>
           <clr-dg-cell> {{file.createdAt }} </clr-dg-cell>

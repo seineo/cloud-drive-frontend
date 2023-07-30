@@ -63,6 +63,23 @@ export class SiteLayoutComponent implements OnInit {
     return file.name.split(".").pop() as string;
   }
 
+  getFileIconType(file: MyFile): string {
+    if (file.type === "application/pdf" || file.type == "dir") {
+      return file.type
+    } else if (file.type.startsWith("image")) {
+      return "image"
+    } else if (file.type.startsWith("video")) {
+      return "video";
+    } else if (file.type === "application/zip" || file.type === "application/gzip"
+      || file.type === "application/x-rar-compressed" || file.type === "application/x-7z-compressed"
+      || file.type === "application/x-tar") {
+      return "zip"
+    } else {
+      return "file";
+    }
+
+  }
+
   truncateMiddle(word: string) {
     const tooLongChars = 20;
 
