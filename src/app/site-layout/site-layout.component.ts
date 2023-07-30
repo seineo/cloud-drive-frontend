@@ -56,6 +56,13 @@ export class SiteLayoutComponent implements OnInit {
     }
   }
 
+  getFileType(file: File): string {
+    if (file.type !== "") {
+      return file.type
+    }
+    return file.name.split(".").pop() as string;
+  }
+
   truncateMiddle(word: string) {
     const tooLongChars = 20;
 
@@ -190,7 +197,7 @@ export class SiteLayoutComponent implements OnInit {
           if (data.exist) { // 秒传
             console.log("秒传");
             // 秒传的效果：直接progress 100%
-            this.fileService.uploadFile(dirHash, fileName, fileHash, file.type, file).subscribe(
+            this.fileService.uploadFile(dirHash, fileName, fileHash, this.getFileType(file), file).subscribe(
               data => {
                 console.log("create entry for existed file:", data.file);
                 this.updateCurDir();
@@ -200,7 +207,7 @@ export class SiteLayoutComponent implements OnInit {
             resolve(file.name);
           } else { // 上传
             if (file.size < environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
-              this.fileService.uploadFile(dirHash, fileName, fileHash, file.type, file).subscribe(
+              this.fileService.uploadFile(dirHash, fileName, fileHash, this.getFileType(file), file).subscribe(
                 resp => {
                   if (resp.type === HttpEventType.Response) {
                     console.log('Upload completed');
@@ -249,7 +256,7 @@ export class SiteLayoutComponent implements OnInit {
                       },
                       // 所有文件块上传完成，请求后端合并
                       complete: () => {
-                        this.fileService.mergeFileChunks(fileHash, file.name, file.type, this.getCurDirHash(), file.size).subscribe(
+                        this.fileService.mergeFileChunks(fileHash, file.name, this.getFileType(file), this.getCurDirHash(), file.size).subscribe(
                           data => {
                             console.log("merged file chunks: ", data);
                             this.updateCurDir();
@@ -296,6 +303,7 @@ export class SiteLayoutComponent implements OnInit {
       }
     )
   }
+
 
   onDoubleClick(file: MyFile) {
     if (file.type == "dir") {

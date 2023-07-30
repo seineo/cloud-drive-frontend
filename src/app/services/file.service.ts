@@ -15,6 +15,7 @@ export class FileService {
 
   }
 
+
   // dirPath should start without slash
   getFilesMetadata(dirHash: string): Observable<any> {
     let url = this.host + "/api/v1/files/metadata/dir/" + dirHash;
