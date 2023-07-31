@@ -22,6 +22,7 @@ export class FileService {
     return this.http.get(url, {withCredentials: true});
   }
 
+
   createDir(hash: string, name: string, dirHash: string): Observable<any> {
     let url = this.host + "/api/v1/files/dir";
     let payload: DirRequest = {
@@ -49,10 +50,16 @@ export class FileService {
     return this.http.post(url, formData, {withCredentials: true, reportProgress: true, observe: 'events'});
   }
 
-  downloadFile(fileHash: string) {
+  downloadFile(fileHash: string, param: string) {
     let url = this.host + "/api/v1/files/file/" + fileHash;
-    return this.http.get(url, {withCredentials: true, responseType: "blob"});
+    return this.http.get(url, {withCredentials: true, responseType: "blob", params: {"fileName": param}});
   }
+
+  downloadDir(dirHash: string, param: string) {
+    let url = this.host + "/api/v1/files/dir/" + dirHash;
+    return this.http.get(url, {withCredentials: true, responseType: "blob", params:{"path": param}});
+  }
+
 
   // hash file using MD5 algorithm.
   // here we read file in chunks to avoid memory overflow

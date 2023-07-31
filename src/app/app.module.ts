@@ -6,7 +6,7 @@ import '@cds/core/icon/register.js';
 import {
   ClarityIcons, cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon,
   plusCircleIcon, shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon,
-  windowCloseIcon, successStandardIcon, folderIcon, fileZipIcon, videoCameraIcon, imageIcon
+  windowCloseIcon, successStandardIcon, folderIcon, fileZipIcon, videoCameraIcon, imageIcon, eyeIcon
 } from '@cds/core/icon';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -24,7 +24,8 @@ import {pdfFileIcon} from "@cds/core/icon/shapes/pdf-file";
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
   shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon, windowCloseIcon,
-  successStandardIcon, folderIcon, fileIcon, fileZipIcon, pdfFileIcon, videoCameraIcon, imageIcon);
+  successStandardIcon, folderIcon, fileIcon, fileZipIcon, pdfFileIcon, videoCameraIcon, imageIcon,
+  eyeIcon);
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,7 +43,8 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
         AppRoutingModule,
         FormsModule,
         HttpClientModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+
     ],
   providers: [
     {

@@ -31,9 +31,3 @@ export interface MyFile {
     size: number
     createdAt: string
 }
-
-export interface MyDir {
-    hash: string,
-    name: string,
-    createdAt: string
-}
