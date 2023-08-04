@@ -8,7 +8,7 @@ import {LoginService} from "../services/login.service";
 import {saveAs} from 'file-saver';
 import {from, mergeMap} from "rxjs";
 import {HttpEventType} from "@angular/common/http";
-import {MyFile, UploadingFile, UploadingStatus} from "../file.model";
+import {MyFile, UploadingFile, UploadingStatus} from "../models/file.model";
 import {error} from "@angular/compiler-cli/src/transformers/util";
 
 // import * as fs from 'fs'
@@ -155,7 +155,8 @@ export class SiteLayoutComponent implements OnInit {
         this.files = data.files;
       },
       error => {
-        console.log("failed to find locally stored root hash on server");
+        console.log("failed to find locally stored or correct root hash on server");
+        localStorage.removeItem("rootHash");
         this.router.navigate(['/login']);
       });
   }

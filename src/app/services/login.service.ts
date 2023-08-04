@@ -3,6 +3,7 @@ import {catchError, Observable, throwError} from "rxjs";
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import * as uuid from 'uuid';
+import {UserLoginRequest, UserSignResponse, UserSignUpRequest} from "../models/user.model";
 
 @Injectable({
   providedIn: 'root'
@@ -26,28 +27,28 @@ export class LoginService {
     return this.http.post(url, formData, {withCredentials: true});
   }
 
-  signUp(name: string, email: string, password: string): Observable<any> {
+  signUp(name: string, email: string, password: string): Observable<UserSignResponse> {
     let url = environment.API_URL + "/api/v1/users";
     let rootHash = uuid.v4();
     // also store root directory hash in local storage,
     // in case that when front end crash user cannot get files under root directory
     localStorage.setItem("rootHash", rootHash);
-    let payload = {
-      "name": name,
-      "email": email,
-      "password": password,
-      "rootHash": rootHash
+    let payload: UserSignUpRequest = {
+      name: name,
+      email: email,
+      password: password,
+      rootHash: rootHash
     };
-    return this.http.post(url, payload, {withCredentials: true});
+    return this.http.post<UserSignResponse>(url, payload, {withCredentials: true});
   }
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string): Observable<UserSignResponse> {
     let url = environment.API_URL + "/api/v1/sessions";
-    let payload = {
-      "email": email,
-      "password": password,
+    let payload: UserLoginRequest = {
+      email: email,
+      password: password
     };
-    return this.http.post(url, payload, {withCredentials: true});
+    return this.http.post<UserSignResponse>(url, payload, {withCredentials: true});
   }
 
   logout(): Observable<any> {

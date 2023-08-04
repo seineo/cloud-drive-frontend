@@ -3,6 +3,7 @@ import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Valid
 import {ClrLoadingState, ClrStepButton} from "@clr/angular";
 import {LoginService} from "../services/login.service";
 import {Router} from "@angular/router";
+import {UserSignResponse} from "../models/user.model";
 
 @Component({
   selector: 'app-sign-up',
@@ -96,10 +97,10 @@ export class SignUpComponent {
     let password = this.form.get("password.password")?.value;
     this.loginService.signUp(name, email, password).subscribe(
       data => {
-        console.log("user registered:", data.user);
+        console.log("user registered:", data.email);
         this.loginService.login(email, password).subscribe(
           data => {
-            console.log("user logged in:", data.user);
+            console.log("user logged in:", data.email);
             this.redirectHome();
           },
           error => console.log(error)

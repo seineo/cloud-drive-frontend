@@ -21,21 +21,23 @@ export class LoginComponent {
   }
 
   redirectHome() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/']);
   }
   onLogin() {
     this.loginService.login(this.email, this.password).subscribe(
       data => {
-        console.log("user logged in:", data.user);
+        console.log("user logged in:", data.email);
         // set rootHash in local storage
         if (localStorage.getItem("rootHash") === null) {
-          localStorage.setItem("rootHash", data.user.rootHash);
+          console.log("there is no rootHash in localStorage");
+          localStorage.setItem("rootHash", data.rootHash);
+        }  else {
+          console.log("get rootHash: ", localStorage.getItem("rootHash"));
         }
         this.redirectHome()
       },
       error => {
         this.errorHidden = false;
-
       }
     )
   }
