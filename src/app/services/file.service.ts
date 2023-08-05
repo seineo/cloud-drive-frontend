@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {from, map, mergeMap, Observable} from "rxjs";
 import {environment} from "../../environments/environment.development";
 import * as CryptoJS from 'crypto-js';
-import {DirRequest, FileRequest} from "../file.model";
+import {DirRequest, FileRequest} from "../models/file.model";
 
 @Injectable({
   providedIn: 'root'
@@ -57,9 +57,18 @@ export class FileService {
 
   downloadDir(dirHash: string, param: string) {
     let url = this.host + "/api/v1/files/dir/" + dirHash;
-    return this.http.get(url, {withCredentials: true, responseType: "blob", params:{"path": param}});
+    return this.http.get(url, {withCredentials: true, responseType: "blob", params: {"path": param}});
   }
 
+  deleteFile(dirHash: string, fileHash: string) {
+    let url = this.host + "/api/v1/files/file/" + dirHash +"/" + fileHash;
+    return this.http.delete(url, {withCredentials: true});
+  }
+
+  deleteDir(dirHash: string) {
+    let url = this.host + "/api/v1/files/dir/" + dirHash;
+    return this.http.delete(url, {withCredentials: true});
+  }
 
   // hash file using MD5 algorithm.
   // here we read file in chunks to avoid memory overflow
@@ -176,6 +185,6 @@ export class FileService {
 
   getMissedChunks(fileHash: string): Observable<any> {
     let url = this.host + "/api/v1/files/chunks/" + fileHash;
-    return this.http.get(url, {withCredentials:true});
+    return this.http.get(url, {withCredentials: true});
   }
 }
