@@ -22,7 +22,9 @@ export class SiteLayoutComponent implements OnInit {
   files: MyFile[] = [];
   curDir = ["我的云盘"];
   curDirHash: string[] = [];  // 与curDir一一对应
-  modelOpen = false;
+  dirModalOpen = false;
+  deletionModalOpen = false;
+  fileToDelete!: MyFile;
   newDirName = "";
   fileUploadingStatus: Map<string, UploadingFile> = new Map<string, UploadingFile>();  // map filename to uploading status
   uploadingNum = 0;
@@ -152,7 +154,7 @@ export class SiteLayoutComponent implements OnInit {
     console.log("cur dir hash:", this.getCurDirHash());
     this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(
       data => {
-        this.files = data.files;
+        this.files = data;
       },
       error => {
         console.log("failed to find locally stored or correct root hash on server");
@@ -183,7 +185,7 @@ export class SiteLayoutComponent implements OnInit {
         console.error(error);
       }
     );
-    this.modelOpen = false;
+    this.dirModalOpen = false;
     form.reset();
   }
 
@@ -337,10 +339,6 @@ export class SiteLayoutComponent implements OnInit {
 
   }
 
-  downloadDir(dir: MyFile) {
-
-  }
-
   downloadFile(file: MyFile) {
     let param = file.name;
     let observableBlob = this.fileService.downloadFile(file.hash, param);
@@ -359,9 +357,25 @@ export class SiteLayoutComponent implements OnInit {
       error => {
         console.error(error);
       }
-    )
+    );
   }
 
+  deleteFile(file: MyFile) {
+    let observable= this.fileService.deleteDir(file.hash);
+    if (file.type !== "dir") {
+      observable = this.fileService.deleteFile(this.getCurDirHash(), file.hash);
+    }
+    observable.subscribe(
+      (resp) => {
+        console.log("successfully deleted");
+        this.deletionModalOpen = false;
+        this.updateCurDir();
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
 
   onDoubleClick(file: MyFile) {
     if (file.type == "dir") {
@@ -373,7 +387,7 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   cancelModal(modalForm: NgForm) {
-    this.modelOpen = false;
+    this.dirModalOpen = false;
     modalForm.resetForm();  // 重置表单，因此再次打开表单不会因为空输入而报错
     this.newDirName = "";
   }
