@@ -51,7 +51,6 @@ export class SiteLayoutComponent implements OnInit {
       console.log("root hash: ", rootHash);
       this.curDirHash.push(rootHash);
       this.updateCurDir();
-      console.log("files: ", this.files);
     } else {  // maybe user clear the local storage
       this.router.navigate(['/login']);
     }
@@ -167,7 +166,7 @@ export class SiteLayoutComponent implements OnInit {
   digDir(dir: MyFile) {
     // 更新当前文件夹信息
     this.curDir.push(dir.name);
-    this.curDirHash.push(dir.hash);
+    this.curDirHash.push(dir.fileHash);
     // 跳转，更新当前文件夹下文件
     this.updateCurDir();
   }
@@ -341,10 +340,10 @@ export class SiteLayoutComponent implements OnInit {
 
   downloadFile(file: MyFile) {
     let param = file.name;
-    let observableBlob = this.fileService.downloadFile(file.hash, param);
+    let observableBlob = this.fileService.downloadFile(file.fileHash, param);
     if (file.type === "dir") {
       param = this.getCurDirPath() + file.name;
-      observableBlob = this.fileService.downloadDir(file.hash, param);
+      observableBlob = this.fileService.downloadDir(file.fileHash, param);
     }
     observableBlob.subscribe(
       (resp) => {
@@ -361,9 +360,9 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   deleteFile(file: MyFile) {
-    let observable= this.fileService.deleteDir(file.hash);
+    let observable= this.fileService.deleteDir(file.fileHash);
     if (file.type !== "dir") {
-      observable = this.fileService.deleteFile(this.getCurDirHash(), file.hash);
+      observable = this.fileService.deleteFile(this.getCurDirHash(), file.fileHash);
     }
     observable.subscribe(
       (resp) => {
@@ -390,5 +389,49 @@ export class SiteLayoutComponent implements OnInit {
     this.dirModalOpen = false;
     modalForm.resetForm();  // 重置表单，因此再次打开表单不会因为空输入而报错
     this.newDirName = "";
+  }
+
+  starFile(file: MyFile) {
+    if (!file.isStarred) {
+      if (file.type === "dir") {
+        this.fileService.starDir(file.fileHash).subscribe(
+          data => {
+            this.updateCurDir();
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      } else {
+        this.fileService.starFile(file.directoryHash, file.fileHash).subscribe(
+          data => {
+            this.updateCurDir();
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      }
+    } else {
+      if (file.type === "dir") {
+        this.fileService.unstarDir(file.fileHash).subscribe(
+          data => {
+            this.updateCurDir();
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      } else {
+        this.fileService.unstarFile(file.directoryHash, file.fileHash).subscribe(
+          data => {
+            this.updateCurDir();
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      }
+    }
   }
 }

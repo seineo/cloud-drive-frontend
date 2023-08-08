@@ -25,9 +25,11 @@ export interface FileRequest {
 }
 
 export interface MyFile {
-    hash: string,
+    directoryHash: string,
+    fileHash: string,
     name: string
     type: string // dir, pdf, img, video...
     size: number
+    isStarred: boolean
     createdAt: string
 }

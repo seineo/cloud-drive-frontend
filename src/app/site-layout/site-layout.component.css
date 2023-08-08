@@ -86,3 +86,7 @@ a:hover {
   text-overflow: ellipsis;
   max-width: 60%;
 }
+
+.file-action-name {
+  margin-left: 5px;
+}

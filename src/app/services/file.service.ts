@@ -187,4 +187,24 @@ export class FileService {
     let url = this.host + "/api/v1/files/chunks/" + fileHash;
     return this.http.get(url, {withCredentials: true});
   }
+
+  starDir(dirHash: string): Observable<any> {
+    let url = this.host + "/api/v1/files/metadata/dir/" + dirHash + "/star";
+    return this.http.put(url, null, {withCredentials: true});
+  }
+
+  unstarDir(dirHash: string): Observable<any> {
+    let url = this.host + "/api/v1/files/metadata/dir/" + dirHash + "/star";
+    return this.http.delete(url, {withCredentials: true});
+  }
+
+  starFile(dirHash: string, fileHash: string): Observable<any> {
+    let url = this.host + "/api/v1/files/metadata/file/" + dirHash + "/" + fileHash +"/star";
+    return this.http.put(url, null, {withCredentials: true});
+  }
+
+  unstarFile(dirHash: string, fileHash: string): Observable<any> {
+    let url = this.host + "/api/v1/files/metadata/file/" + dirHash + "/" + fileHash +"/star";
+    return this.http.delete(url, {withCredentials: true});
+  }
 }

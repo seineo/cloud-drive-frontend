@@ -72,9 +72,10 @@
               <cds-icon shape="share"></cds-icon>
               共享
             </button>
-            <button class="action-item">
+            <button class="action-item" (click)="starFile(file)">
               <cds-icon shape="star"></cds-icon>
-              星标
+              <span class="file-action-name" *ngIf="!file.isStarred">星标</span>
+              <span class="file-action-name" *ngIf="file.isStarred">取消星标</span>
             </button>
             <button class="action-item" (click)="deletionModalOpen=true;fileToDelete=file;">
               <cds-icon shape="trash"></cds-icon>
@@ -94,6 +95,7 @@
 <!--            <cds-icon shape="file-zip" *ngIf="file.type === 'application/zip'"></cds-icon>-->
 <!--            <cds-icon shape="file" *ngIf="file.type !== 'dir' &&file.type !== 'application/zip'"></cds-icon>-->
             {{ file.name }}
+            <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
           </clr-dg-cell>
           <clr-dg-cell> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
           <clr-dg-cell> {{humanFileSize(file.size, false, 1)}} </clr-dg-cell>
