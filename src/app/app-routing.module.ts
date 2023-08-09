@@ -13,11 +13,15 @@ const routes: Routes = [
     path: 'login',
     component: LoginComponent
   },
-  // {
-  //   path: '',
-  //   redirectTo: '/home',
-  //   pathMatch: 'full'
-  // },
+  {
+    path: '',
+    redirectTo: '/mydrive',
+    pathMatch: 'full'
+  },
+  {
+    path: 'mydrive',
+    component: SiteLayoutComponent
+  },
   {
     path: '',
     component: SiteLayoutComponent,
@@ -28,6 +32,7 @@ const routes: Routes = [
         },
       ]
   },
+
   {
     path: '**',
     component: PageNotFoundComponent

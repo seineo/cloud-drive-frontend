@@ -25,11 +25,12 @@ export interface FileRequest {
 }
 
 export interface MyFile {
-    directoryHash: string,
-    fileHash: string,
-    name: string
-    type: string // dir, pdf, img, video...
-    size: number
-    isStarred: boolean
-    createdAt: string
+  directoryHash: string,
+  fileHash: string,
+  name: string
+  type: string // dir, pdf, img, video...
+  size: number
+  isStarred: boolean
+  createdAt: string
+  deletedAt: string
 }

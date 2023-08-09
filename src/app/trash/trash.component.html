@@ -1,0 +1,68 @@
+<span class="title">回收站</span>
+
+<div class="alert alert-warning" role="alert">
+  <div class="alert-items">
+    <div class="alert-item static">
+      <div class="alert-icon-wrapper" style="margin-top: auto; margin-bottom: auto">
+        <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+      </div>
+      <div class="alert-text" style="margin-top: auto; margin-bottom: auto">
+        丢弃在回收站的内容将在30天后被永久删除
+      </div>
+      <div class="alert-actions">
+        <button class="btn btn-sm alert-action">清空回收站</button>
+      </div>
+    </div>
+  </div>
+<!--  <button type="button" class="close" aria-label="Close">-->
+<!--    <cds-icon aria-hidden="true" shape="close"></cds-icon>-->
+<!--  </button>-->
+</div>
+
+<clr-datagrid>
+  <!--        clrDGField binds model properties to columns-->
+  <clr-dg-column [clrDgField]="'Name'" class="table-file-name-column">文件名</clr-dg-column>
+  <clr-dg-column [clrDgField]="'CreateTime'">删除时间</clr-dg-column>
+  <clr-dg-column [clrDgField]="'Size'">大小</clr-dg-column>
+  <!--        <clr-dg-column>操作</clr-dg-column>-->
+  <clr-dg-placeholder>这里空空如也</clr-dg-placeholder>
+
+
+  <clr-dg-row class="data-row" *clrDgItems="let file of files">
+    <clr-dg-action-overflow>
+      <button class="action-item">
+        <cds-icon shape="history"></cds-icon>
+        还原
+      </button>
+      <button class="action-item">
+        <cds-icon shape="eraser"></cds-icon>
+        永久删除
+      </button>
+
+    </clr-dg-action-overflow>
+    <clr-dg-cell class="table-file-name">
+      <ng-container [ngSwitch]="fileService.getFileIconType(file)">
+        <cds-icon *ngSwitchCase="'application/pdf'" shape="pdf-file" solid></cds-icon>
+        <cds-icon *ngSwitchCase="'image'" shape="image"></cds-icon>
+        <cds-icon *ngSwitchCase="'video'" shape="video-camera"></cds-icon>
+        <cds-icon *ngSwitchCase="'zip'" shape="file-zip"></cds-icon>
+        <cds-icon *ngSwitchCase="'dir'" shape="folder"></cds-icon>
+        <cds-icon *ngSwitchDefault shape="file"></cds-icon>
+      </ng-container>
+      <!--            <cds-icon shape="file-zip" *ngIf="file.type === 'application/zip'"></cds-icon>-->
+      <!--            <cds-icon shape="file" *ngIf="file.type !== 'dir' &&file.type !== 'application/zip'"></cds-icon>-->
+      {{ file.name }}
+      <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
+    </clr-dg-cell>
+    <clr-dg-cell> {{file.deletedAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
+    <clr-dg-cell> {{fileService.humanFileSize(file.size, false, 1)}} </clr-dg-cell>
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="10">
+      <clr-dg-page-size [clrPageSizeOptions]="[10,20,50]">每页文件数</clr-dg-page-size>
+      {{pagination.totalItems}} 个文件中的
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>

@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {from, map, mergeMap, Observable} from "rxjs";
 import {environment} from "../../environments/environment.development";
 import * as CryptoJS from 'crypto-js';
-import {DirRequest, FileRequest} from "../models/file.model";
+import {DirRequest, FileRequest, MyFile} from "../models/file.model";
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,60 @@ export class FileService {
 
   }
 
+  getFileType(file: File): string {
+    if (file.type !== "") {
+      return file.type
+    }
+    return file.name.split(".").pop() as string;
+  }
+
+  getFileIconType(file: MyFile): string {
+    if (file.type === "application/pdf" || file.type == "dir") {
+      return file.type
+    } else if (file.type.startsWith("image")) {
+      return "image"
+    } else if (file.type.startsWith("video")) {
+      return "video";
+    } else if (file.type === "application/zip" || file.type === "application/gzip"
+      || file.type === "application/x-rar-compressed" || file.type === "application/x-7z-compressed"
+      || file.type === "application/x-tar") {
+      return "zip"
+    } else {
+      return "file";
+    }
+  }
+
+  /**
+   * Format bytes as human-readable text.
+   *
+   * @param bytes Number of bytes.
+   * @param si True to use metric (SI) units, aka powers of 1000. False to use
+   *           binary (IEC), aka powers of 1024.
+   * @param dp Number of decimal places to display.
+   *
+   * @return Formatted string.
+   */
+  humanFileSize(bytes: number, si=false, dp=1) {
+    const thresh = si ? 1000 : 1024;
+
+    if (Math.abs(bytes) < thresh) {
+      return bytes + ' B';
+    }
+
+    const units = si
+      ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+      : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+    let u = -1;
+    const r = 10**dp;
+
+    do {
+      bytes /= thresh;
+      ++u;
+    } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
+
+
+    return bytes.toFixed(dp) + ' ' + units[u];
+  }
 
   // dirPath should start without slash
   getFilesMetadata(dirHash: string): Observable<any> {

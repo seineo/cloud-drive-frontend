@@ -31,7 +31,7 @@ export class SiteLayoutComponent implements OnInit {
   fileUploadingStatus: Map<string, UploadingFile> = new Map<string, UploadingFile>();  // map filename to uploading status
   uploadingNum = 0;
 
-  constructor(private loginService: LoginService, private fileService: FileService,
+  constructor(private loginService: LoginService, public fileService: FileService,
               private router: Router) {
     // this.fileUploadingStatus.set("test-file1", {
     //   Name: "test-file1",
@@ -61,64 +61,10 @@ export class SiteLayoutComponent implements OnInit {
 
   isHomePage(): boolean {
     console.log("url:", this.router.url);
-    return this.router.url === "/";
+    return this.router.url === "/mydrive";
   }
 
-  getFileType(file: File): string {
-    if (file.type !== "") {
-      return file.type
-    }
-    return file.name.split(".").pop() as string;
-  }
 
-  getFileIconType(file: MyFile): string {
-    if (file.type === "application/pdf" || file.type == "dir") {
-      return file.type
-    } else if (file.type.startsWith("image")) {
-      return "image"
-    } else if (file.type.startsWith("video")) {
-      return "video";
-    } else if (file.type === "application/zip" || file.type === "application/gzip"
-      || file.type === "application/x-rar-compressed" || file.type === "application/x-7z-compressed"
-      || file.type === "application/x-tar") {
-      return "zip"
-    } else {
-      return "file";
-    }
-
-  }
-
-  /**
-   * Format bytes as human-readable text.
-   *
-   * @param bytes Number of bytes.
-   * @param si True to use metric (SI) units, aka powers of 1000. False to use
-   *           binary (IEC), aka powers of 1024.
-   * @param dp Number of decimal places to display.
-   *
-   * @return Formatted string.
-   */
-  humanFileSize(bytes: number, si=false, dp=1) {
-    const thresh = si ? 1000 : 1024;
-
-    if (Math.abs(bytes) < thresh) {
-      return bytes + ' B';
-    }
-
-    const units = si
-      ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-    let u = -1;
-    const r = 10**dp;
-
-    do {
-      bytes /= thresh;
-      ++u;
-    } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
-
-
-    return bytes.toFixed(dp) + ' ' + units[u];
-  }
 
   truncateMiddle(word: string) {
     const tooLongChars = 20;
@@ -264,7 +210,7 @@ export class SiteLayoutComponent implements OnInit {
           if (data.exist) { // 秒传
             console.log("秒传");
             // 秒传的效果：直接progress 100%
-            this.fileService.uploadFile(dirHash, fileName, fileHash, this.getFileType(file), file).subscribe(
+            this.fileService.uploadFile(dirHash, fileName, fileHash, this.fileService.getFileType(file), file).subscribe(
               data => {
                 console.log("create entry for existed file:", data.file);
                 this.updateCurDir();
@@ -274,7 +220,7 @@ export class SiteLayoutComponent implements OnInit {
             resolve(file.name);
           } else { // 上传
             if (file.size < environment.FILE_SIZE_THRESHOLD) { // 文件大小小于阈值，直接上传
-              this.fileService.uploadFile(dirHash, fileName, fileHash, this.getFileType(file), file).subscribe(
+              this.fileService.uploadFile(dirHash, fileName, fileHash, this.fileService.getFileType(file), file).subscribe(
                 resp => {
                   if (resp.type === HttpEventType.Response) {
                     console.log('Upload completed');
@@ -323,7 +269,7 @@ export class SiteLayoutComponent implements OnInit {
                       },
                       // 所有文件块上传完成，请求后端合并
                       complete: () => {
-                        this.fileService.mergeFileChunks(fileHash, file.name, this.getFileType(file), this.getCurDirHash(), file.size).subscribe(
+                        this.fileService.mergeFileChunks(fileHash, file.name, this.fileService.getFileType(file), this.getCurDirHash(), file.size).subscribe(
                           data => {
                             console.log("merged file chunks: ", data);
                             this.updateCurDir();

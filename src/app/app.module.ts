@@ -4,9 +4,27 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ClarityModule } from "@clr/angular";
 import '@cds/core/icon/register.js';
 import {
-  ClarityIcons, cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon,
-  plusCircleIcon, shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon,
-  windowCloseIcon, successStandardIcon, folderIcon, fileZipIcon, videoCameraIcon, imageIcon, eyeIcon
+  ClarityIcons,
+  cogIcon,
+  cloudIcon,
+  clockIcon,
+  pictureIcon,
+  fileIcon,
+  plusCircleIcon,
+  shareIcon,
+  starIcon,
+  trashIcon,
+  uploadCloudIcon,
+  downloadCloudIcon,
+  windowCloseIcon,
+  successStandardIcon,
+  folderIcon,
+  fileZipIcon,
+  videoCameraIcon,
+  imageIcon,
+  eyeIcon,
+  historyIcon,
+  eraserIcon, hardDiskIcon
 } from '@cds/core/icon';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -21,11 +39,12 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import {AuthInterceptorService} from "./services/auth-interceptor.service";
 import { UploadListComponent } from './upload-list/upload-list.component';
 import {pdfFileIcon} from "@cds/core/icon/shapes/pdf-file";
+import {TrashComponent} from "./trash/trash.component";
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
   shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon, windowCloseIcon,
   successStandardIcon, folderIcon, fileIcon, fileZipIcon, pdfFileIcon, videoCameraIcon, imageIcon,
-  eyeIcon);
+  eyeIcon, historyIcon, eraserIcon, hardDiskIcon);
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,6 +54,7 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
     SignUpComponent,
     PageNotFoundComponent,
     UploadListComponent,
+    TrashComponent
   ],
     imports: [
         BrowserModule,
@@ -44,7 +64,6 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
         FormsModule,
         HttpClientModule,
         ReactiveFormsModule,
-
     ],
   providers: [
     {

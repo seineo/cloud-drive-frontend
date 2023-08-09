@@ -6,6 +6,10 @@
 
   <div class="content-container">
     <clr-vertical-nav>
+      <a clrVerticalNavLink routerLink="/mydrive" routerLinkActive="active">
+        <cds-icon shape="hard-disk"></cds-icon>
+        我的云盘
+      </a>
       <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
         <cds-icon shape="clock"></cds-icon>
         最近使用
@@ -18,7 +22,7 @@
         <cds-icon shape="star"></cds-icon>
         星标文件
       </a>
-      <a clrVerticalNavLink routerLink="./recent" routerLinkActive="active">
+      <a clrVerticalNavLink routerLink="/trash" routerLinkActive="active">
         <cds-icon shape="trash"></cds-icon>
         回收站
       </a>
@@ -86,7 +90,7 @@
 
             </clr-dg-action-overflow>
             <clr-dg-cell class="table-file-name">
-              <ng-container [ngSwitch]="getFileIconType(file)">
+              <ng-container [ngSwitch]="fileService.getFileIconType(file)">
                 <cds-icon *ngSwitchCase="'application/pdf'" shape="pdf-file" solid></cds-icon>
                 <cds-icon *ngSwitchCase="'image'" shape="image"></cds-icon>
                 <cds-icon *ngSwitchCase="'video'" shape="video-camera"></cds-icon>
@@ -100,7 +104,7 @@
               <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
             </clr-dg-cell>
             <clr-dg-cell> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
-            <clr-dg-cell> {{humanFileSize(file.size, false, 1)}} </clr-dg-cell>
+            <clr-dg-cell> {{fileService.humanFileSize(file.size, false, 1)}} </clr-dg-cell>
           </clr-dg-row>
 
           <clr-dg-footer>
@@ -162,21 +166,6 @@
     </button>
   </div>
 </clr-modal>
-
-<!--<div class="modal" *ngIf="uploadModalOpen">-->
-<!--  <div class="modal-dialog" role="dialog" aria-hidden="true">-->
-<!--    <div class="modal-content">-->
-<!--      <div class="modal-header">-->
-<!--        <button aria-label="Close" class="close" type="button" (click)="uploadModalOpen=false">-->
-<!--          <cds-icon shape="close"></cds-icon>-->
-<!--        </button>-->
-<!--        <h3 class="modal-title">上传列表</h3>-->
-<!--      </div>-->
-
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
-<!--<div class="modal-backdrop" aria-hidden="true"></div>-->
 
 
 <clr-modal [(clrModalOpen)]="uploadModalOpen">
