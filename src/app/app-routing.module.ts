@@ -5,6 +5,7 @@ import {LoginComponent} from "./login/login.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {UploadListComponent} from "./upload-list/upload-list.component";
 import {ClrIconModule} from "@clr/angular";
+import {TrashComponent} from "./trash/trash.component";
 
 // 路由匹配有顺序，因此应该具体的在前面
 const routes: Routes = [
@@ -12,15 +13,20 @@ const routes: Routes = [
     path: 'login',
     component: LoginComponent
   },
-  {
-    path: 'home',
-    component: SiteLayoutComponent,
-
-  },
+  // {
+  //   path: '',
+  //   redirectTo: '/home',
+  //   pathMatch: 'full'
+  // },
   {
     path: '',
-    redirectTo: '/home',
-    pathMatch: 'full'
+    component: SiteLayoutComponent,
+      children: [
+        {
+          path: 'trash',
+          component: TrashComponent,
+        },
+      ]
   },
   {
     path: '**',

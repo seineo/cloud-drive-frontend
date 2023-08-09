@@ -25,90 +25,93 @@
     </clr-vertical-nav>
 
     <div class="content-area">
-      <div class="container">
-        <nav class="breadcrumbs">
-          <!--          current directory has different style, the root has no prefix separator-->
-          <div *ngFor="let dir of curDir; let i = index">
-            <span class="separator" *ngIf="i !== 0">/</span>
-            <a *ngIf="i !== curDir.length - 1" (click)="navigatePath(i)">{{dir}}</a>
-            <span class="current-page" *ngIf="i === curDir.length - 1">{{dir}}</span>
+      <router-outlet *ngIf="!isHomePage()"></router-outlet>
+      <div *ngIf="isHomePage()">
+        <div class="container">
+          <nav class="breadcrumbs">
+            <!--          current directory has different style, the root has no prefix separator-->
+            <div *ngFor="let dir of curDir; let i = index">
+              <span class="separator" *ngIf="i !== 0">/</span>
+              <a *ngIf="i !== curDir.length - 1" (click)="navigatePath(i)">{{dir}}</a>
+              <span class="current-page" *ngIf="i === curDir.length - 1">{{dir}}</span>
+            </div>
+          </nav>
+          <div class="file-display">
+            <clr-dropdown>
+              <button class="btn btn-primary" clrDropdownTrigger>
+                <cds-icon shape="plus-circle"></cds-icon>
+                <span style="margin: 5px">新建</span>
+                <cds-icon shape="angle" direction="down"></cds-icon>
+              </button>
+              <clr-dropdown-menu *clrIfOpen>
+                <div clrDropdownItem (click)="fileUpload.click()">上传文件</div>
+                <div clrDropdownItem (click)="dirModalOpen = true">新建文件夹</div>
+              </clr-dropdown-menu>
+            </clr-dropdown>
           </div>
-        </nav>
-        <div class="file-display">
-          <clr-dropdown>
-            <button class="btn btn-primary" clrDropdownTrigger>
-              <cds-icon shape="plus-circle"></cds-icon>
-              <span style="margin: 5px">新建</span>
-              <cds-icon shape="angle" direction="down"></cds-icon>
-            </button>
-            <clr-dropdown-menu *clrIfOpen>
-              <div clrDropdownItem (click)="fileUpload.click()">上传文件</div>
-              <div clrDropdownItem (click)="dirModalOpen = true">新建文件夹</div>
-            </clr-dropdown-menu>
-          </clr-dropdown>
         </div>
+
+        <clr-datagrid>
+          <!--        clrDGField binds model properties to columns-->
+          <clr-dg-column [clrDgField]="'Name'" class="table-file-name-column">文件名</clr-dg-column>
+          <clr-dg-column [clrDgField]="'CreateTime'">创建时间</clr-dg-column>
+          <clr-dg-column [clrDgField]="'Size'">大小</clr-dg-column>
+          <!--        <clr-dg-column>操作</clr-dg-column>-->
+          <clr-dg-placeholder>这里空空如也</clr-dg-placeholder>
+
+
+          <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="onDoubleClick(file)">
+            <clr-dg-action-overflow>
+              <button class="action-item">
+                <cds-icon shape="eye"></cds-icon>
+                预览
+              </button>
+              <button class="action-item" (click)="downloadFile(file)">
+                <cds-icon shape="download-cloud"></cds-icon>
+                下载
+              </button>
+              <button class="action-item">
+                <cds-icon shape="share"></cds-icon>
+                共享
+              </button>
+              <button class="action-item" (click)="starFile(file)">
+                <cds-icon shape="star"></cds-icon>
+                <span class="file-action-name" *ngIf="!file.isStarred">星标</span>
+                <span class="file-action-name" *ngIf="file.isStarred">取消星标</span>
+              </button>
+              <button class="action-item" (click)="deletionModalOpen=true;fileToDelete=file;">
+                <cds-icon shape="trash"></cds-icon>
+                删除
+              </button>
+
+            </clr-dg-action-overflow>
+            <clr-dg-cell class="table-file-name">
+              <ng-container [ngSwitch]="getFileIconType(file)">
+                <cds-icon *ngSwitchCase="'application/pdf'" shape="pdf-file" solid></cds-icon>
+                <cds-icon *ngSwitchCase="'image'" shape="image"></cds-icon>
+                <cds-icon *ngSwitchCase="'video'" shape="video-camera"></cds-icon>
+                <cds-icon *ngSwitchCase="'zip'" shape="file-zip"></cds-icon>
+                <cds-icon *ngSwitchCase="'dir'" shape="folder"></cds-icon>
+                <cds-icon *ngSwitchDefault shape="file"></cds-icon>
+              </ng-container>
+              <!--            <cds-icon shape="file-zip" *ngIf="file.type === 'application/zip'"></cds-icon>-->
+              <!--            <cds-icon shape="file" *ngIf="file.type !== 'dir' &&file.type !== 'application/zip'"></cds-icon>-->
+              {{ file.name }}
+              <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
+            </clr-dg-cell>
+            <clr-dg-cell> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
+            <clr-dg-cell> {{humanFileSize(file.size, false, 1)}} </clr-dg-cell>
+          </clr-dg-row>
+
+          <clr-dg-footer>
+            <clr-dg-pagination #pagination [clrDgPageSize]="10">
+              <clr-dg-page-size [clrPageSizeOptions]="[10,20,50]">每页文件数</clr-dg-page-size>
+              {{pagination.totalItems}} 个文件中的
+              {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+            </clr-dg-pagination>
+          </clr-dg-footer>
+        </clr-datagrid>
       </div>
-
-      <clr-datagrid>
-        <!--        clrDGField binds model properties to columns-->
-        <clr-dg-column [clrDgField]="'Name'" class="table-file-name-column">文件名</clr-dg-column>
-        <clr-dg-column [clrDgField]="'CreateTime'">创建时间</clr-dg-column>
-        <clr-dg-column [clrDgField]="'Size'">大小</clr-dg-column>
-        <!--        <clr-dg-column>操作</clr-dg-column>-->
-        <clr-dg-placeholder>这里空空如也</clr-dg-placeholder>
-
-
-        <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="onDoubleClick(file)">
-          <clr-dg-action-overflow>
-            <button class="action-item">
-              <cds-icon shape="eye"></cds-icon>
-              预览
-            </button>
-            <button class="action-item" (click)="downloadFile(file)">
-              <cds-icon shape="download-cloud"></cds-icon>
-              下载
-            </button>
-            <button class="action-item">
-              <cds-icon shape="share"></cds-icon>
-              共享
-            </button>
-            <button class="action-item" (click)="starFile(file)">
-              <cds-icon shape="star"></cds-icon>
-              <span class="file-action-name" *ngIf="!file.isStarred">星标</span>
-              <span class="file-action-name" *ngIf="file.isStarred">取消星标</span>
-            </button>
-            <button class="action-item" (click)="deletionModalOpen=true;fileToDelete=file;">
-              <cds-icon shape="trash"></cds-icon>
-              删除
-            </button>
-
-          </clr-dg-action-overflow>
-          <clr-dg-cell class="table-file-name">
-            <ng-container [ngSwitch]="getFileIconType(file)">
-              <cds-icon *ngSwitchCase="'application/pdf'" shape="pdf-file" solid></cds-icon>
-              <cds-icon *ngSwitchCase="'image'" shape="image"></cds-icon>
-              <cds-icon *ngSwitchCase="'video'" shape="video-camera"></cds-icon>
-              <cds-icon *ngSwitchCase="'zip'" shape="file-zip"></cds-icon>
-              <cds-icon *ngSwitchCase="'dir'" shape="folder"></cds-icon>
-              <cds-icon *ngSwitchDefault shape="file"></cds-icon>
-            </ng-container>
-<!--            <cds-icon shape="file-zip" *ngIf="file.type === 'application/zip'"></cds-icon>-->
-<!--            <cds-icon shape="file" *ngIf="file.type !== 'dir' &&file.type !== 'application/zip'"></cds-icon>-->
-            {{ file.name }}
-            <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
-          </clr-dg-cell>
-          <clr-dg-cell> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
-          <clr-dg-cell> {{humanFileSize(file.size, false, 1)}} </clr-dg-cell>
-        </clr-dg-row>
-
-        <clr-dg-footer>
-          <clr-dg-pagination #pagination [clrDgPageSize]="10">
-            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50]">每页文件数</clr-dg-page-size>
-            {{pagination.totalItems}} 个文件中的
-            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-          </clr-dg-pagination>
-        </clr-dg-footer>
-      </clr-datagrid>
     </div>
   </div>
 </div>

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {UploadingFile, UploadingStatus} from "../file.model";
+import {UploadingFile, UploadingStatus} from "../models/file.model";
 
 @Component({
   selector: 'app-upload-list',

@@ -3,7 +3,7 @@ import {FileService} from "../services/file.service";
 import {v4 as uuid} from 'uuid';
 import {NgForm} from "@angular/forms";
 import {environment} from "../../environments/environment.development";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {LoginService} from "../services/login.service";
 import {saveAs} from 'file-saver';
 import {from, mergeMap} from "rxjs";
@@ -29,7 +29,8 @@ export class SiteLayoutComponent implements OnInit {
   fileUploadingStatus: Map<string, UploadingFile> = new Map<string, UploadingFile>();  // map filename to uploading status
   uploadingNum = 0;
 
-  constructor(private loginService: LoginService, private fileService: FileService, private router: Router) {
+  constructor(private loginService: LoginService, private fileService: FileService,
+              private router: Router) {
     // this.fileUploadingStatus.set("test-file1", {
     //   Name: "test-file1",
     //   Status: "Waiting",
@@ -54,6 +55,11 @@ export class SiteLayoutComponent implements OnInit {
     } else {  // maybe user clear the local storage
       this.router.navigate(['/login']);
     }
+  }
+
+  isHomePage(): boolean {
+    console.log("url:", this.router.url);
+    return this.router.url === "/";
   }
 
   getFileType(file: File): string {
