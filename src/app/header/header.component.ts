@@ -10,9 +10,8 @@ import {UploadingFile} from "../models/file.model";
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  @Input() uploadingFiles!: Map<string, UploadingFile>;
-  @Input() uploadingNum!: number;
-  up_down_load_hidden = true;
+  @Input() uploadingNum = 0;
+  @Output() uploadModalEvent = new EventEmitter<boolean>();
   constructor(private router: Router, private loginService: LoginService) {
   }
 
@@ -31,5 +30,8 @@ export class HeaderComponent {
     );
   }
 
+  openUploadModal() {
+    this.uploadModalEvent.emit(true);
+  }
 
 }

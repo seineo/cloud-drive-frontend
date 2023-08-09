@@ -1,7 +1,7 @@
 <!-- Site Layout -->
 <div class="main-container">
   <!-- Top Navigation -->
-  <app-header [uploadingFiles]="fileUploadingStatus" [uploadingNum]="uploadingNum"></app-header>
+  <app-header [uploadingNum]="uploadingNum" (uploadModalEvent)="openUploadModal()"></app-header>
   <!-- Content -->
 
   <div class="content-container">
@@ -138,7 +138,7 @@
   </div>
 </clr-modal>
 
-<!--modal for creating new directory-->
+<!--modal for delete files-->
 <clr-modal [(clrModalOpen)]="deletionModalOpen">
   <h3 class="modal-title" *ngIf="fileToDelete && fileToDelete.type === 'dir'">删除文件夹：{{fileToDelete.name}}</h3>
   <h3 class="modal-title" *ngIf="fileToDelete && fileToDelete.type !== 'dir'">删除文件：{{fileToDelete.name}}</h3>
@@ -161,4 +161,50 @@
     <button type="button" class="btn btn-primary" (click)="deleteFile(fileToDelete)">确认
     </button>
   </div>
+</clr-modal>
+
+<!--<div class="modal" *ngIf="uploadModalOpen">-->
+<!--  <div class="modal-dialog" role="dialog" aria-hidden="true">-->
+<!--    <div class="modal-content">-->
+<!--      <div class="modal-header">-->
+<!--        <button aria-label="Close" class="close" type="button" (click)="uploadModalOpen=false">-->
+<!--          <cds-icon shape="close"></cds-icon>-->
+<!--        </button>-->
+<!--        <h3 class="modal-title">上传列表</h3>-->
+<!--      </div>-->
+
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<!--<div class="modal-backdrop" aria-hidden="true"></div>-->
+
+
+<clr-modal [(clrModalOpen)]="uploadModalOpen">
+  <h3 class="modal-title">上传列表</h3>
+  <div class="modal-body">
+    <div class="modal-body" *ngIf="noData()">
+      只展示本次上传的文件列表
+    </div>
+    <div class="modal-body" *ngIf="!noData()">
+      <div class="upload-progress">
+        <div *ngFor="let file of fileUploadingStatus | keyvalue" class="upload-item">
+          <div class="file-info">{{ file.key }}</div>
+          <div class="progress-bar">
+            <div class="progress" [style.width]="file.value.progress + '%'"></div>
+          </div>
+          <div class="cancel-button" *ngIf="file.value.status !== StatusEnum.COMPLETED">
+            <cds-icon shape="window-close"></cds-icon>
+          </div>
+          <div class="success-button" *ngIf="file.value.status === StatusEnum.COMPLETED">
+            <cds-icon shape="success-standard"></cds-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!--  <div class="modal-footer">-->
+<!--    <button type="button" class="btn btn-outline" (click)="deletionModalOpen = false">取消</button>-->
+<!--    <button type="button" class="btn btn-primary" (click)="deleteFile(fileToDelete)">确认-->
+<!--    </button>-->
+<!--  </div>-->
 </clr-modal>

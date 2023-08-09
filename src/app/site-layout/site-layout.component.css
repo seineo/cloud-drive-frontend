@@ -90,3 +90,58 @@ a:hover {
 .file-action-name {
   margin-left: 5px;
 }
+
+/* upload modal */
+.upload-progress {
+  padding: 10px;
+}
+
+.upload-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.file-info {
+  flex: 1;
+  max-width: 25%;
+  /* 由于容器大小问题 文本过长还是会溢出，所以选择隐藏溢出的部分，用省略号代替 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-bar {
+  width: 60%;
+  height: 10px;
+  background-color: #e0e0e0;
+  margin-right: 10px;
+}
+
+.progress {
+  height: 100%;
+  background-color: hsl(198, 100%, 32%);
+}
+
+.status {
+  margin-right: 10px;
+}
+
+.cancel-button {
+  background-color: hsl(9, 92%, 50%);
+  margin-right: 10px;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.success-button {
+  background-color: hsl(93, 85%, 32%);
+  margin-right: 10px;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+}

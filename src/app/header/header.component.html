@@ -11,7 +11,7 @@
     </label>
   </form>
   <div class="header-actions">
-    <a class="nav-link " (click)="up_down_load_hidden = false">
+    <a class="nav-link " (click)="openUploadModal()">
       <cds-icon class="icon" shape="upload-cloud"></cds-icon>
     </a>
 <!--    show number of uploading files-->
@@ -34,5 +34,3 @@
   </div>
 </header>
 
-<app-upload-list [hidden]="up_down_load_hidden" [(modalHidden)]="up_down_load_hidden"
-                 [UploadingFiles]="uploadingFiles"></app-upload-list>

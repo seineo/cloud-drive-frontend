@@ -24,6 +24,8 @@ export class SiteLayoutComponent implements OnInit {
   curDirHash: string[] = [];  // 与curDir一一对应
   dirModalOpen = false;
   deletionModalOpen = false;
+  uploadModalOpen = false;
+  StatusEnum = UploadingStatus
   fileToDelete!: MyFile;
   newDirName = "";
   fileUploadingStatus: Map<string, UploadingFile> = new Map<string, UploadingFile>();  // map filename to uploading status
@@ -192,6 +194,15 @@ export class SiteLayoutComponent implements OnInit {
     );
     this.dirModalOpen = false;
     form.reset();
+  }
+
+  openUploadModal() {
+    this.uploadModalOpen = true;
+  }
+
+  noData(): boolean {
+    // console.log("upload modal, uploading files: ", this.UploadingFiles);
+    return this.fileUploadingStatus.size === 0;
   }
 
   async onFileSelected(event: Event) {
