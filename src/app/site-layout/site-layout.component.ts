@@ -60,11 +60,8 @@ export class SiteLayoutComponent implements OnInit {
   }
 
   isHomePage(): boolean {
-    console.log("url:", this.router.url);
     return this.router.url === "/mydrive";
   }
-
-
 
   truncateMiddle(word: string) {
     const tooLongChars = 20;
@@ -107,6 +104,7 @@ export class SiteLayoutComponent implements OnInit {
     console.log("cur dir hash:", this.getCurDirHash());
     this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(
       data => {
+        console.log("files: ", data);
         this.files = data;
       },
       error => {

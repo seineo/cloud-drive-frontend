@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MyFile} from "../models/file.model";
 import {FileService} from "../services/file.service";
 
@@ -7,9 +7,17 @@ import {FileService} from "../services/file.service";
   templateUrl: './trash.component.html',
   styleUrls: ['./trash.component.css']
 })
-export class TrashComponent {
+export class TrashComponent implements OnInit {
   files: MyFile[] = [];
 
   constructor(public fileService: FileService) {
+  }
+
+  ngOnInit() {
+    this.fileService.getTrashFiles().subscribe(
+      data => {
+        this.files = data;
+      }
+    )
   }
 }
