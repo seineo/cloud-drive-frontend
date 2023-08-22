@@ -88,7 +88,7 @@ export class SignUpComponent {
   }
 
   redirectHome() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/mydrive']);
   }
 
   submit() {
