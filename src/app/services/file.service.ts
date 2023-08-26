@@ -243,27 +243,53 @@ export class FileService {
   }
 
   starDir(dirHash: string): Observable<any> {
-    let url = this.host + "/api/v1/files/metadata/dir/" + dirHash + "/star";
+    let url = `${this.host}/api/v1/files/metadata/dir/${dirHash}/star`;
     return this.http.put(url, null, {withCredentials: true});
   }
 
   unstarDir(dirHash: string): Observable<any> {
-    let url = this.host + "/api/v1/files/metadata/dir/" + dirHash + "/star";
+    let url = `${this.host}/api/v1/files/metadata/dir/${dirHash}/star`;
     return this.http.delete(url, {withCredentials: true});
   }
 
   starFile(dirHash: string, fileHash: string): Observable<any> {
-    let url = this.host + "/api/v1/files/metadata/file/" + dirHash + "/" + fileHash +"/star";
+    let url = `${this.host}/api/v1/files/metadata/file/${dirHash}/${fileHash}/star`;
     return this.http.put(url, null, {withCredentials: true});
   }
 
   unstarFile(dirHash: string, fileHash: string): Observable<any> {
-    let url = this.host + "/api/v1/files/metadata/file/" + dirHash + "/" + fileHash +"/star";
+    let url = `${this.host}/api/v1/files/metadata/file/${dirHash}/${fileHash}/star`;
     return this.http.delete(url, {withCredentials: true});
   }
 
   getTrashFiles(): Observable<MyFile[]> {
-    let url = this.host + "/api/v1/files/trash";
+    let url = `${this.host}/api/v1/files/trash`;
     return this.http.get<MyFile[]>(url, {withCredentials: true});
   }
+
+  deleteTrashFile(dirHash: string, fileHash: string): Observable<any> {
+    let url = `${this.host}/api/v1/files/trash/${dirHash}/${fileHash}`;
+    return this.http.delete(url, {withCredentials: true});
+  }
+
+  deleteTrashDir(dirHash: string): Observable<any> {
+    let url = `${this.host}/api/v1/files/trash/${dirHash}`;
+    return this.http.delete(url, {withCredentials: true});
+  }
+
+  clearTrash(): Observable<any> {
+    let url = `${this.host}/api/v1/files/trash`;
+    return this.http.delete(url, {withCredentials: true});
+  }
+
+  restoreTrashFile(dirHash: string, fileHash: string): Observable<any> {
+    let url = `${this.host}/api/v1/files/${dirHash}/${fileHash}/untrash`;
+    return this.http.post(url, {}, {withCredentials: true});
+  }
+
+  restoreTrashDir(dirHash: string): Observable<any> {
+    let url = `${this.host}/api/v1/files/${dirHash}/untrash`;
+    return this.http.post(url, {}, {withCredentials: true});
+  }
+
 }

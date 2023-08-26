@@ -10,7 +10,7 @@
         丢弃在回收站的内容将在30天后被永久删除
       </div>
       <div class="alert-actions">
-        <button class="btn btn-sm alert-action">清空回收站</button>
+        <button class="btn btn-sm alert-action" (click)="clearTrash()">清空回收站</button>
       </div>
     </div>
   </div>
@@ -30,11 +30,11 @@
 
   <clr-dg-row class="data-row" *clrDgItems="let file of files">
     <clr-dg-action-overflow>
-      <button class="action-item">
+      <button class="action-item" (click)="restoreFile(file)">
         <cds-icon shape="history"></cds-icon>
         还原
       </button>
-      <button class="action-item">
+      <button class="action-item" (click)="deleteTrashFile(file)">
         <cds-icon shape="eraser"></cds-icon>
         永久删除
       </button>
