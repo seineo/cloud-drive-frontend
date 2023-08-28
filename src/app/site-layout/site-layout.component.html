@@ -83,7 +83,7 @@
                 <span class="file-action-name" *ngIf="!file.isStarred">星标</span>
                 <span class="file-action-name" *ngIf="file.isStarred">取消星标</span>
               </button>
-              <button class="action-item" (click)="deletionModalOpen=true;fileToDelete=file;">
+              <button class="action-item" (click)="deleteFile(file)">
                 <cds-icon shape="trash"></cds-icon>
                 删除
               </button>
@@ -138,31 +138,6 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="cancelModal(dirModalForm)">取消</button>
     <button type="button" class="btn btn-primary" (click)="createDir(dirModalForm)" [disabled]="!dirModalForm.valid">确认
-    </button>
-  </div>
-</clr-modal>
-
-<!--modal for delete files-->
-<clr-modal [(clrModalOpen)]="deletionModalOpen">
-  <h3 class="modal-title" *ngIf="fileToDelete && fileToDelete.type === 'dir'">删除文件夹：{{fileToDelete.name}}</h3>
-  <h3 class="modal-title" *ngIf="fileToDelete && fileToDelete.type !== 'dir'">删除文件：{{fileToDelete.name}}</h3>
-  <div class="modal-body">
-    <div class="alert alert-warning" role="alert">
-      <div class="alert-items">
-        <div class="alert-item static">
-          <div class="alert-icon-wrapper">
-            <cds-icon class="alert-icon" shape="exclamation-triangle"></cds-icon>
-          </div>
-          <div class="alert-text">
-            请注意，删除后无法撤销。
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="deletionModalOpen = false">取消</button>
-    <button type="button" class="btn btn-primary" (click)="deleteFile(fileToDelete)">确认
     </button>
   </div>
 </clr-modal>

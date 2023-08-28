@@ -23,10 +23,8 @@ export class SiteLayoutComponent implements OnInit {
   curDir = ["我的云盘"];
   curDirHash: string[] = [];  // 与curDir一一对应
   dirModalOpen = false;
-  deletionModalOpen = false;
   uploadModalOpen = false;
   StatusEnum = UploadingStatus
-  fileToDelete!: MyFile;
   newDirName = "";
   fileUploadingStatus: Map<string, UploadingFile> = new Map<string, UploadingFile>();  // map filename to uploading status
   uploadingNum = 0;
@@ -328,7 +326,6 @@ export class SiteLayoutComponent implements OnInit {
     observable.subscribe(
       (resp) => {
         console.log("successfully deleted");
-        this.deletionModalOpen = false;
         this.updateCurDir();
       },
       error => {

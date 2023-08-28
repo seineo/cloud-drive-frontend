@@ -10,6 +10,8 @@ import {error} from "@angular/compiler-cli/src/transformers/util";
 })
 export class TrashComponent implements OnInit {
   files: MyFile[] = [];
+  deletionModalOpen = false;
+  fileToDelete!: MyFile;
 
   constructor(public fileService: FileService) {
   }
@@ -60,6 +62,7 @@ export class TrashComponent implements OnInit {
   }
 
   deleteTrashFile(file: MyFile) {
+    this.deletionModalOpen = false;
     if (file.type === "dir") {
       this.fileService.deleteTrashDir(file.fileHash).subscribe(
         data => {

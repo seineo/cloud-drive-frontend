@@ -34,7 +34,7 @@
         <cds-icon shape="history"></cds-icon>
         还原
       </button>
-      <button class="action-item" (click)="deleteTrashFile(file)">
+      <button class="action-item" (click)="deletionModalOpen=true;fileToDelete=file;">
         <cds-icon shape="eraser"></cds-icon>
         永久删除
       </button>
@@ -66,3 +66,28 @@
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+
+<!--modal for delete files-->
+<clr-modal [(clrModalOpen)]="deletionModalOpen">
+  <h3 class="modal-title" *ngIf="fileToDelete && fileToDelete.type === 'dir'">删除文件夹：{{fileToDelete.name}}</h3>
+  <h3 class="modal-title" *ngIf="fileToDelete && fileToDelete.type !== 'dir'">删除文件：{{fileToDelete.name}}</h3>
+  <div class="modal-body">
+    <div class="alert alert-warning" role="alert">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <cds-icon class="alert-icon" shape="exclamation-triangle"></cds-icon>
+          </div>
+          <div class="alert-text">
+            请注意，删除后无法撤销。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="deletionModalOpen = false">取消</button>
+    <button type="button" class="btn btn-primary" (click)="deleteTrashFile(fileToDelete)">确认
+    </button>
+  </div>
+</clr-modal>
