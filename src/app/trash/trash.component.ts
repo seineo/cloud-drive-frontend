@@ -11,8 +11,8 @@ import {error} from "@angular/compiler-cli/src/transformers/util";
 export class TrashComponent implements OnInit {
   files: MyFile[] = [];
   deletionModalOpen = false;
-  fileToDelete!: MyFile;
-
+  fileToDelete!: MyFile
+  clearModalOpen = false;
   constructor(public fileService: FileService) {
   }
 
@@ -29,6 +29,7 @@ export class TrashComponent implements OnInit {
   }
 
   clearTrash() {
+    this.clearModalOpen = false;
     this.fileService.clearTrash().subscribe(
       data => {
         this.refreshTrash();

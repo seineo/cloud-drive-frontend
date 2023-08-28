@@ -10,7 +10,7 @@
         丢弃在回收站的内容将在30天后被永久删除
       </div>
       <div class="alert-actions">
-        <button class="btn btn-sm alert-action" (click)="clearTrash()">清空回收站</button>
+        <button class="btn btn-sm alert-action" (click)="clearModalOpen = true">清空回收站</button>
       </div>
     </div>
   </div>
@@ -88,6 +88,30 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="deletionModalOpen = false">取消</button>
     <button type="button" class="btn btn-primary" (click)="deleteTrashFile(fileToDelete)">确认
+    </button>
+  </div>
+</clr-modal>
+
+<!--modal for clear files-->
+<clr-modal [(clrModalOpen)]="clearModalOpen">
+  <h3 class="modal-title">清空回收站</h3>
+  <div class="modal-body">
+    <div class="alert alert-warning" role="alert">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <cds-icon class="alert-icon" shape="exclamation-triangle"></cds-icon>
+          </div>
+          <div class="alert-text">
+            请注意，删除后无法撤销。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="clearModalOpen = false">取消</button>
+    <button type="button" class="btn btn-primary" (click)="clearTrash()">确认
     </button>
   </div>
 </clr-modal>
