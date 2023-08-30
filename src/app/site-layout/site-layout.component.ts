@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {FileService} from "../services/file.service";
 import {v4 as uuid} from 'uuid';
 import {NgForm} from "@angular/forms";
@@ -10,6 +10,7 @@ import {from, mergeMap} from "rxjs";
 import {HttpEventType} from "@angular/common/http";
 import {MyFile, UploadingFile, UploadingStatus} from "../models/file.model";
 import {error} from "@angular/compiler-cli/src/transformers/util";
+import {FileTableComponent} from "../file-table/file-table.component";
 
 // import * as fs from 'fs'
 
@@ -18,10 +19,13 @@ import {error} from "@angular/compiler-cli/src/transformers/util";
   templateUrl: './site-layout.component.html',
   styleUrls: ['./site-layout.component.css']
 })
-export class SiteLayoutComponent implements OnInit {
+export class SiteLayoutComponent implements OnInit, AfterViewInit {
+  @ViewChild(FileTableComponent)
+
+  private fileTableComponent!: FileTableComponent;
   files: MyFile[] = [];
-  curDir = ["我的云盘"];
-  curDirHash: string[] = [];  // 与curDir一一对应
+  dirNameArray = ["我的云盘"];
+  dirHashArray: string[] = [];  // 与curDir一一对应
   dirModalOpen = false;
   uploadModalOpen = false;
   StatusEnum = UploadingStatus
@@ -30,35 +34,37 @@ export class SiteLayoutComponent implements OnInit {
   uploadingNum = 0;
 
   constructor(private loginService: LoginService, public fileService: FileService,
-              private router: Router) {
-    // this.fileUploadingStatus.set("test-file1", {
-    //   Name: "test-file1",
-    //   Status: "Waiting",
-    //   Progress: 40
-    // } as UploadingFile);
-    // this.fileUploadingStatus.set("test-file2test-file", {
-    //   Name: "test-file2",
-    //   Status: "Completed",
-    //   Progress: 80
-    // } as UploadingFile);
+              private router: Router, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
-    // happens when front end restarts or crashes, so read from local storage
-    let hashKey = localStorage.getItem("rootHash") !== null;
-    if (hashKey) {
-      console.log("get local stored root hash");
-      let rootHash = localStorage.getItem("rootHash") as string;
-      console.log("root hash: ", rootHash);
-      this.curDirHash.push(rootHash);
-      this.updateCurDir();
-    } else {  // maybe user clear the local storage
-      this.router.navigate(['/login']);
-    }
+    // TODO 读取url参数，根据dirHash刷新，注意区分根目录 根目录显示为mydrive
+    console.log("name array in ngOnInit: ", this.dirNameArray);
+  }
+
+  ngAfterViewInit() {
+    this.route.paramMap.subscribe(params => {
+      let paramDir = params.get("dirHash");
+      if (paramDir) {
+        // this.fileTableComponent.refreshFiles(paramDir);
+        console.log("param dir:", paramDir);
+      } else {
+        let hashKey = localStorage.getItem("rootHash") !== null;
+        let rootHash = "";
+        if (hashKey) {
+          console.log("get local stored root hash");
+          rootHash = localStorage.getItem("rootHash") as string;
+          this.dirHashArray.push(rootHash);
+          this.fileTableComponent.refreshFiles(rootHash);
+        } else {  // maybe user clear the local storage
+          this.router.navigate(['/login']);
+        }
+      }
+    });
   }
 
   isHomePage(): boolean {
-    return this.router.url === "/mydrive";
+    return this.router.url === "/mydrive" || this.router.url.startsWith("/dir");
   }
 
   truncateMiddle(word: string) {
@@ -77,48 +83,34 @@ export class SiteLayoutComponent implements OnInit {
 
   navigatePath(index: number) {
     // 删除目标目录后的路径
-    this.curDir.splice(index + 1);
-    this.curDirHash.splice(index + 1);
-    console.log("after navigate, curDir:", this.curDir);
-    console.log("after navigate, curDirHash:", this.curDirHash);
+    this.dirNameArray.splice(index + 1);
+    this.dirHashArray.splice(index + 1);
+    this.router.navigate(["/dir", this.dirHashArray[index]]);
     // 跳转
-    this.updateCurDir();
   }
 
   getCurDirPath() {
-    let dirPath = this.curDir[0];
-    for (let i = 1; i < this.curDir.length; i++) {
-      dirPath = dirPath + "/" + this.curDir[i];
+    let dirPath = this.dirNameArray[0];
+    for (let i = 1; i < this.dirNameArray.length; i++) {
+      dirPath = dirPath + "/" + this.dirNameArray[i];
     }
     return dirPath;
   }
 
   getCurDirHash() {
-    return this.curDirHash[this.curDirHash.length - 1];
+    return this.dirHashArray[this.dirHashArray.length - 1];
   }
 
   // 更新当前文件夹的文件列表
-  updateCurDir() {
-    console.log("cur dir hash:", this.getCurDirHash());
-    this.fileService.getFilesMetadata(this.getCurDirHash()).subscribe(
-      data => {
-        console.log("files: ", data);
-        this.files = data;
-      },
-      error => {
-        console.log("failed to find locally stored or correct root hash on server");
-        localStorage.removeItem("rootHash");
-        this.router.navigate(['/login']);
-      });
-  }
 
   // 如果是文件夹，进入该文件夹；如果是文件，预览
   digDir(dir: MyFile) {
     // 更新当前文件夹信息
-    this.curDir.push(dir.name);
-    this.curDirHash.push(dir.fileHash);
-    // 跳转，更新当前文件夹下文件
-    this.updateCurDir();
+    this.router.navigate(["/dir", dir.fileHash]);
+    this.dirNameArray.push(dir.name);
+    this.dirHashArray.push(dir.fileHash);
+    console.log("name array in digDir: ", this.dirNameArray);
+    // this.fileTableComponent.refreshFiles(dir.fileHash);
   }
 
   createDir(form: NgForm) {
@@ -128,7 +120,7 @@ export class SiteLayoutComponent implements OnInit {
       data => {
         console.log("create dir:", data.dir);
         // refresh current directory
-        this.updateCurDir();
+        this.fileTableComponent.refreshFiles(this.getCurDirHash());
       },
       error => {
         console.error(error);
@@ -209,7 +201,7 @@ export class SiteLayoutComponent implements OnInit {
             this.fileService.uploadFile(dirHash, fileName, fileHash, this.fileService.getFileType(file), file).subscribe(
               data => {
                 console.log("create entry for existed file:", data.file);
-                this.updateCurDir();
+                this.fileTableComponent.refreshFiles(this.getCurDirHash());
               }
             )
             this.uploadCompleted(file);
@@ -220,7 +212,7 @@ export class SiteLayoutComponent implements OnInit {
                 resp => {
                   if (resp.type === HttpEventType.Response) {
                     console.log('Upload completed');
-                    this.updateCurDir();
+                    this.fileTableComponent.refreshFiles(this.getCurDirHash());
                     this.uploadCompleted(file);
                     resolve(fileName);
                   }
@@ -268,7 +260,7 @@ export class SiteLayoutComponent implements OnInit {
                         this.fileService.mergeFileChunks(fileHash, file.name, this.fileService.getFileType(file), this.getCurDirHash(), file.size).subscribe(
                           data => {
                             console.log("merged file chunks: ", data);
-                            this.updateCurDir();
+                            this.fileTableComponent.refreshFiles(this.getCurDirHash());
                             this.uploadCompleted(file);
                             resolve(file.name);
                             // window.location.reload();
@@ -297,99 +289,10 @@ export class SiteLayoutComponent implements OnInit {
 
   }
 
-  downloadFile(file: MyFile) {
-    let param = file.name;
-    let observableBlob = this.fileService.downloadFile(file.fileHash, param);
-    if (file.type === "dir") {
-      param = this.getCurDirPath() + file.name;
-      observableBlob = this.fileService.downloadDir(file.fileHash, param);
-    }
-    observableBlob.subscribe(
-      (resp) => {
-        if (file.type === "dir") {
-          saveAs(resp, file.name + ".zip");
-        } else {
-          saveAs(resp, file.name);
-        }
-      },
-      error => {
-        console.error(error);
-      }
-    );
-  }
-
-  deleteFile(file: MyFile) {
-    let observable= this.fileService.deleteDir(file.fileHash);
-    if (file.type !== "dir") {
-      observable = this.fileService.deleteFile(this.getCurDirHash(), file.fileHash);
-    }
-    observable.subscribe(
-      (resp) => {
-        console.log("successfully deleted");
-        this.updateCurDir();
-      },
-      error => {
-        console.error(error);
-      }
-    );
-  }
-
-  onDoubleClick(file: MyFile) {
-    if (file.type == "dir") {
-      this.digDir(file);
-    } else {
-      // TODO 支持预览
-      console.log("预览暂时不支持")
-    }
-  }
-
   cancelModal(modalForm: NgForm) {
     this.dirModalOpen = false;
     modalForm.resetForm();  // 重置表单，因此再次打开表单不会因为空输入而报错
     this.newDirName = "";
   }
 
-  starFile(file: MyFile) {
-    if (!file.isStarred) {
-      if (file.type === "dir") {
-        this.fileService.starDir(file.fileHash).subscribe(
-          data => {
-            this.updateCurDir();
-          },
-          error => {
-            console.error(error);
-          }
-        );
-      } else {
-        this.fileService.starFile(file.directoryHash, file.fileHash).subscribe(
-          data => {
-            this.updateCurDir();
-          },
-          error => {
-            console.error(error);
-          }
-        );
-      }
-    } else {
-      if (file.type === "dir") {
-        this.fileService.unstarDir(file.fileHash).subscribe(
-          data => {
-            this.updateCurDir();
-          },
-          error => {
-            console.error(error);
-          }
-        );
-      } else {
-        this.fileService.unstarFile(file.directoryHash, file.fileHash).subscribe(
-          data => {
-            this.updateCurDir();
-          },
-          error => {
-            console.error(error);
-          }
-        );
-      }
-    }
-  }
 }

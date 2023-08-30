@@ -40,6 +40,7 @@ import {AuthInterceptorService} from "./services/auth-interceptor.service";
 import { UploadListComponent } from './upload-list/upload-list.component';
 import {pdfFileIcon} from "@cds/core/icon/shapes/pdf-file";
 import {TrashComponent} from "./trash/trash.component";
+import { FileTableComponent } from './file-table/file-table.component';
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
   shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon, windowCloseIcon,
@@ -54,7 +55,8 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
     SignUpComponent,
     PageNotFoundComponent,
     UploadListComponent,
-    TrashComponent
+    TrashComponent,
+    FileTableComponent,
   ],
     imports: [
         BrowserModule,

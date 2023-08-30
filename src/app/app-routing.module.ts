@@ -23,6 +23,10 @@ const routes: Routes = [
     component: SiteLayoutComponent
   },
   {
+    path: "dir/:dirHash",
+    component: SiteLayoutComponent
+  },
+  {
     path: '',
     component: SiteLayoutComponent,
       children: [
