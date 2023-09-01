@@ -8,7 +8,7 @@ import {LoginService} from "../services/login.service";
 import {saveAs} from 'file-saver';
 import {from, mergeMap} from "rxjs";
 import {HttpEventType} from "@angular/common/http";
-import {MyFile, UploadingFile, UploadingStatus} from "../models/file.model";
+import {DirInPath, MyFile, UploadingFile, UploadingStatus} from "../models/file.model";
 import {error} from "@angular/compiler-cli/src/transformers/util";
 import {FileTableComponent} from "../file-table/file-table.component";
 
@@ -24,8 +24,9 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
 
   private fileTableComponent!: FileTableComponent;
   files: MyFile[] = [];
-  dirNameArray = ["我的云盘"];
-  dirHashArray: string[] = [];  // 与curDir一一对应
+  // dirNameArray = ["我的云盘"];
+  // dirHashArray: string[] = [];  // 与curDir一一对应
+  dirPathArray: DirInPath[] = [];
   dirModalOpen = false;
   uploadModalOpen = false;
   StatusEnum = UploadingStatus
@@ -39,7 +40,7 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // TODO 读取url参数，根据dirHash刷新，注意区分根目录 根目录显示为mydrive
-    console.log("name array in ngOnInit: ", this.dirNameArray);
+    console.log("name array in ngOnInit: ", this.dirPathArray);
   }
 
   ngAfterViewInit() {
@@ -48,13 +49,28 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
       if (paramDir) {
         // this.fileTableComponent.refreshFiles(paramDir);
         console.log("param dir:", paramDir);
+        if (this.dirPathArray.length == 0) {
+          // TODO trace directory names and hashes in the path
+          this.fileService.getTraceDirs(paramDir).subscribe(
+            (dirs: DirInPath[]) => {
+              this.dirPathArray = dirs;
+            },
+            error => {
+              console.error(error);
+            }
+          );
+        }
+        this.fileTableComponent.refreshFiles(paramDir);
       } else {
         let hashKey = localStorage.getItem("rootHash") !== null;
         let rootHash = "";
         if (hashKey) {
           console.log("get local stored root hash");
           rootHash = localStorage.getItem("rootHash") as string;
-          this.dirHashArray.push(rootHash);
+          this.dirPathArray.push({
+            name: "我的云盘",
+            hash: rootHash,
+          });
           this.fileTableComponent.refreshFiles(rootHash);
         } else {  // maybe user clear the local storage
           this.router.navigate(['/login']);
@@ -83,22 +99,21 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
 
   navigatePath(index: number) {
     // 删除目标目录后的路径
-    this.dirNameArray.splice(index + 1);
-    this.dirHashArray.splice(index + 1);
-    this.router.navigate(["/dir", this.dirHashArray[index]]);
+    this.dirPathArray.splice(index + 1);
+    this.router.navigate(["/dir", this.dirPathArray[index].hash]);
     // 跳转
   }
 
   getCurDirPath() {
-    let dirPath = this.dirNameArray[0];
-    for (let i = 1; i < this.dirNameArray.length; i++) {
-      dirPath = dirPath + "/" + this.dirNameArray[i];
+    let dirPath = this.dirPathArray[0].name;
+    for (let i = 1; i < this.dirPathArray.length; i++) {
+      dirPath = dirPath + "/" + this.dirPathArray[i].name;
     }
     return dirPath;
   }
 
   getCurDirHash() {
-    return this.dirHashArray[this.dirHashArray.length - 1];
+    return this.dirPathArray[this.dirPathArray.length - 1].hash;
   }
 
   // 更新当前文件夹的文件列表
@@ -107,10 +122,10 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
   digDir(dir: MyFile) {
     // 更新当前文件夹信息
     this.router.navigate(["/dir", dir.fileHash]);
-    this.dirNameArray.push(dir.name);
-    this.dirHashArray.push(dir.fileHash);
-    console.log("name array in digDir: ", this.dirNameArray);
-    // this.fileTableComponent.refreshFiles(dir.fileHash);
+    this.dirPathArray.push({
+      name: dir.name,
+      hash: dir.fileHash,
+    });
   }
 
   createDir(form: NgForm) {

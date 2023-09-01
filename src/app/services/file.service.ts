@@ -291,4 +291,9 @@ export class FileService {
     let url = `${this.host}/api/v1/files/${dirHash}/untrash`;
     return this.http.post(url, {}, {withCredentials: true});
   }
+
+  getTraceDirs(dirHash: string): Observable<any> {
+    let url = `${this.host}/api/v1/files/metadata/dir/${dirHash}/trace`;
+    return this.http.get(url, {withCredentials: true});
+  }
 }

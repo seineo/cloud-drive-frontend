@@ -34,10 +34,10 @@
         <div class="container">
           <nav class="breadcrumbs">
             <!--          current directory has different style, the root has no prefix separator-->
-            <div *ngFor="let dir of dirNameArray; let i = index">
+            <div *ngFor="let dir of dirPathArray; let i = index">
               <span class="separator" *ngIf="i !== 0">/</span>
-              <a *ngIf="i !== dirNameArray.length - 1" (click)="navigatePath(i)">{{dir}}</a>
-              <span class="current-page" *ngIf="i === dirNameArray.length - 1">{{dir}}</span>
+              <a *ngIf="i !== dirPathArray.length - 1" (click)="navigatePath(i)">{{dir.name}}</a>
+              <span class="current-page" *ngIf="i === dirPathArray.length - 1">{{dir.name}}</span>
             </div>
           </nav>
           <div class="file-display">
