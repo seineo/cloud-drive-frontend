@@ -49,7 +49,7 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
       if (paramDir) {
         // this.fileTableComponent.refreshFiles(paramDir);
         console.log("param dir:", paramDir);
-        if (this.dirPathArray.length == 0) {
+        if (this.dirPathArray.length == 0 || paramDir !== this.getCurDirHash()) {
           // TODO trace directory names and hashes in the path
           this.fileService.getTraceDirs(paramDir).subscribe(
             (dirs: DirInPath[]) => {
