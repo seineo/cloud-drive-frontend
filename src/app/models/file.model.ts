@@ -39,3 +39,8 @@ export interface DirInPath {
   name: string
   hash: string
 }
+
+export enum TimeShowed {
+  CREATED,
+  ACCESSED
+}

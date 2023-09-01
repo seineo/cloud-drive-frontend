@@ -1,8 +1,8 @@
 <clr-datagrid>
   <!--        clrDGField binds model properties to columns-->
   <clr-dg-column [clrDgField]="'Name'" class="table-file-name-column">文件名</clr-dg-column>
-  <clr-dg-column [clrDgField]="'CreateTime'">创建时间</clr-dg-column>
-  <clr-dg-column [clrDgField]="'Size'">大小</clr-dg-column>
+  <clr-dg-column [clrDgField]="'CreateTime'" *ngIf="timeShowed === TimeShowed.CREATED">创建时间</clr-dg-column>
+  <clr-dg-column [clrDgField]="'Size'" [clrDgColType]="'number'">大小</clr-dg-column>
   <!--        <clr-dg-column>操作</clr-dg-column>-->
   <clr-dg-placeholder>这里空空如也</clr-dg-placeholder>
 
@@ -46,7 +46,7 @@
       {{ file.name }}
       <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
     </clr-dg-cell>
-    <clr-dg-cell> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
+    <clr-dg-cell *ngIf="timeShowed === TimeShowed.CREATED"> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
     <clr-dg-cell> {{fileService.humanFileSize(file.size, false, 1)}} </clr-dg-cell>
   </clr-dg-row>
 

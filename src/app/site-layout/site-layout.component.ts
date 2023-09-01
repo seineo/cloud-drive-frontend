@@ -8,7 +8,7 @@ import {LoginService} from "../services/login.service";
 import {saveAs} from 'file-saver';
 import {from, mergeMap} from "rxjs";
 import {HttpEventType} from "@angular/common/http";
-import {DirInPath, MyFile, UploadingFile, UploadingStatus} from "../models/file.model";
+import {DirInPath, MyFile, TimeShowed, UploadingFile, UploadingStatus} from "../models/file.model";
 import {error} from "@angular/compiler-cli/src/transformers/util";
 import {FileTableComponent} from "../file-table/file-table.component";
 
@@ -23,6 +23,7 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
   @ViewChild(FileTableComponent)
 
   private fileTableComponent!: FileTableComponent;
+  TimeShowed = TimeShowed
   files: MyFile[] = [];
   // dirNameArray = ["我的云盘"];
   // dirHashArray: string[] = [];  // 与curDir一一对应

@@ -1,8 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {MyFile} from "../models/file.model";
-import {LoginService} from "../services/login.service";
+import {MyFile, TimeShowed} from "../models/file.model";
 import {FileService} from "../services/file.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {Router} from "@angular/router";
 import {saveAs} from "file-saver";
 
 @Component({
@@ -11,8 +10,10 @@ import {saveAs} from "file-saver";
   styleUrls: ['./file-table.component.css']
 })
 export class FileTableComponent implements OnInit {
-  files: MyFile[] = [];
+  TimeShowed = TimeShowed
+  @Input() timeShowed: TimeShowed = TimeShowed.CREATED;
   @Output() dirEvent = new EventEmitter<MyFile>();
+  files: MyFile[] = [];
 
   constructor(public fileService: FileService, private router: Router) {
   }
