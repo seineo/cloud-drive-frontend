@@ -100,7 +100,11 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
   navigatePath(index: number) {
     // 删除目标目录后的路径
     this.dirPathArray.splice(index + 1);
-    this.router.navigate(["/dir", this.dirPathArray[index].hash]);
+    if (index === 0) {
+      this.router.navigate(['/mydrive']);
+    } else {
+      this.router.navigate(["/dir", this.dirPathArray[index].hash]);
+    }
     // 跳转
   }
 
