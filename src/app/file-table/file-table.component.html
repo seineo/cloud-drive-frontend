@@ -11,15 +11,15 @@
     <clr-dg-action-overflow>
       <button class="action-item">
         <cds-icon shape="eye"></cds-icon>
-        预览
+        <span class="file-action-name">预览</span>
       </button>
       <button class="action-item" (click)="downloadFile(file)">
         <cds-icon shape="download-cloud"></cds-icon>
-        下载
+        <span class="file-action-name">下载</span>
       </button>
       <button class="action-item">
         <cds-icon shape="share"></cds-icon>
-        共享
+        <span class="file-action-name">共享</span>
       </button>
       <button class="action-item" (click)="starFile(file)">
         <cds-icon shape="star"></cds-icon>
@@ -28,7 +28,7 @@
       </button>
       <button class="action-item" (click)="deleteFile(file)">
         <cds-icon shape="trash"></cds-icon>
-        删除
+        <span class="file-action-name">删除</span>
       </button>
 
     </clr-dg-action-overflow>

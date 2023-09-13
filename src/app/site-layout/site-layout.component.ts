@@ -19,14 +19,12 @@ import {FileTableComponent} from "../file-table/file-table.component";
   templateUrl: './site-layout.component.html',
   styleUrls: ['./site-layout.component.css']
 })
-export class SiteLayoutComponent implements OnInit, AfterViewInit {
+export class SiteLayoutComponent implements OnInit {
   @ViewChild(FileTableComponent)
 
   private fileTableComponent!: FileTableComponent;
   TimeShowed = TimeShowed
   files: MyFile[] = [];
-  // dirNameArray = ["我的云盘"];
-  // dirHashArray: string[] = [];  // 与curDir一一对应
   dirPathArray: DirInPath[] = [];
   dirModalOpen = false;
   uploadModalOpen = false;
@@ -40,18 +38,12 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // TODO 读取url参数，根据dirHash刷新，注意区分根目录 根目录显示为mydrive
     console.log("name array in ngOnInit: ", this.dirPathArray);
-  }
-
-  ngAfterViewInit() {
     this.route.paramMap.subscribe(params => {
       let paramDir = params.get("dirHash");
-      if (paramDir) {
-        // this.fileTableComponent.refreshFiles(paramDir);
-        console.log("param dir:", paramDir);
+      if (paramDir) {  // 如果不是根目录
+        // 如果从别的页面组件跳转 或者 当当前页面组件的其他目录跳转过来， 则需要更新目录路径
         if (this.dirPathArray.length == 0 || paramDir !== this.getCurDirHash()) {
-          // TODO trace directory names and hashes in the path
           this.fileService.getTraceDirs(paramDir).subscribe(
             (dirs: DirInPath[]) => {
               this.dirPathArray = dirs;
@@ -61,8 +53,8 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
             }
           );
         }
-        this.fileTableComponent.refreshFiles(paramDir);
-      } else {
+        // this.fileTableComponent.refreshFiles(paramDir);
+      } else {  // 根目录
         let hashKey = localStorage.getItem("rootHash") !== null;
         let rootHash = "";
         if (hashKey) {
@@ -72,7 +64,6 @@ export class SiteLayoutComponent implements OnInit, AfterViewInit {
             name: "我的云盘",
             hash: rootHash,
           });
-          this.fileTableComponent.refreshFiles(rootHash);
         } else {  // maybe user clear the local storage
           this.router.navigate(['/login']);
         }

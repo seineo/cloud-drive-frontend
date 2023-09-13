@@ -6,6 +6,7 @@ import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {UploadListComponent} from "./upload-list/upload-list.component";
 import {ClrIconModule} from "@clr/angular";
 import {TrashComponent} from "./trash/trash.component";
+import {StarComponent} from "./star/star.component";
 
 // 路由匹配有顺序，因此应该具体的在前面
 const routes: Routes = [
@@ -34,6 +35,10 @@ const routes: Routes = [
           path: 'trash',
           component: TrashComponent,
         },
+        {
+          path: 'starred',
+          component: StarComponent,
+        }
       ]
   },
 

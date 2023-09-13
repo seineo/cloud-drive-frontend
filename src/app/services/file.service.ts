@@ -262,6 +262,11 @@ export class FileService {
     return this.http.delete(url, {withCredentials: true});
   }
 
+  getStarredFiles(): Observable<MyFile[]> {
+    let url = `${this.host}/api/v1/files/metadata/star`;
+    return this.http.get<MyFile[]>(url, {withCredentials: true});
+  }
+
   getTrashFiles(): Observable<MyFile[]> {
     let url = `${this.host}/api/v1/files/trash`;
     return this.http.get<MyFile[]>(url, {withCredentials: true});

@@ -41,6 +41,7 @@ import { UploadListComponent } from './upload-list/upload-list.component';
 import {pdfFileIcon} from "@cds/core/icon/shapes/pdf-file";
 import {TrashComponent} from "./trash/trash.component";
 import { FileTableComponent } from './file-table/file-table.component';
+import {StarComponent} from "./star/star.component";
 
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
   shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon, windowCloseIcon,
@@ -57,6 +58,7 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
     UploadListComponent,
     TrashComponent,
     FileTableComponent,
+    StarComponent
   ],
     imports: [
         BrowserModule,

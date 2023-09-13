@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MyFile, TimeShowed} from "../models/file.model";
 import {FileService} from "../services/file.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {saveAs} from "file-saver";
 
 @Component({
@@ -15,13 +15,51 @@ export class FileTableComponent implements OnInit {
   @Output() dirEvent = new EventEmitter<MyFile>();
   files: MyFile[] = [];
 
-  constructor(public fileService: FileService, private router: Router) {
+  constructor(public fileService: FileService, private router: Router,  private route: ActivatedRoute) {
   }
 
   ngOnInit() {
+    this.refresh();
+  }
+
+  refresh() {
+    console.log("in file table, url:", this.router.url);
+    if (this.router.url === "/mydrive" || this.router.url.startsWith("/dir")) { // 首页
+      this.route.paramMap.subscribe(params => {
+        let paramDir = params.get("dirHash");
+        console.log("in file table, paramDir:", paramDir);
+        if (paramDir) {  // 如果不是根目录
+          this.fileService.getFilesMetadata(paramDir).subscribe(
+            data => {
+              this.files = data;
+            }
+          );
+        } else {
+          let hashKey = localStorage.getItem("rootHash") !== null;
+          let rootHash = "";
+          if (hashKey) {
+            rootHash = localStorage.getItem("rootHash") as string;
+            this.fileService.getFilesMetadata(rootHash).subscribe(
+              data => {
+                this.files = data;
+              }
+            );
+          } else {
+            this.router.navigate(['/login']);
+          }
+        }
+      });
+    } else if (this.router.url === "/starred") {  // 星标页
+      this.fileService.getStarredFiles().subscribe(
+        data => {
+          this.files = data;
+        }
+      );
+    }
   }
 
   refreshFiles(dirHash: string) {
+    console.log("called refresh");
     this.fileService.getFilesMetadata(dirHash).subscribe(
       data => {
         this.files = data;
@@ -71,8 +109,8 @@ export class FileTableComponent implements OnInit {
       observable = this.fileService.deleteFile(file.directoryHash, file.fileHash);
     }
     observable.subscribe(
-      (resp) => {
-        this.refreshFiles(file.directoryHash);
+      () => {
+        this.refresh();
       },
       error => {
         console.error(error);
@@ -84,8 +122,8 @@ export class FileTableComponent implements OnInit {
     if (!file.isStarred) {
       if (file.type === "dir") {
         this.fileService.starDir(file.fileHash).subscribe(
-          data => {
-            this.refreshFiles(file.directoryHash);
+          () => {
+            this.refresh();
           },
           error => {
             console.error(error);
@@ -93,8 +131,8 @@ export class FileTableComponent implements OnInit {
         );
       } else {
         this.fileService.starFile(file.directoryHash, file.fileHash).subscribe(
-          data => {
-            this.refreshFiles(file.directoryHash);
+          () => {
+            this.refresh();
           },
           error => {
             console.error(error);
@@ -104,8 +142,8 @@ export class FileTableComponent implements OnInit {
     } else {
       if (file.type === "dir") {
         this.fileService.unstarDir(file.fileHash).subscribe(
-          data => {
-            this.refreshFiles(file.directoryHash);
+          () => {
+            this.refresh();
           },
           error => {
             console.error(error);
@@ -113,8 +151,8 @@ export class FileTableComponent implements OnInit {
         );
       } else {
         this.fileService.unstarFile(file.directoryHash, file.fileHash).subscribe(
-          data => {
-            this.refreshFiles(file.directoryHash);
+          () => {
+            this.refresh();
           },
           error => {
             console.error(error);
