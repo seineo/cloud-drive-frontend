@@ -19,7 +19,15 @@ export class FileService {
     if (file.type !== "") {
       return file.type
     }
-    return file.name.split(".").pop() as string;
+    let fullName = file.name.split(".")
+    if (fullName.length <= 1) {  // 无后缀
+      return ""
+    }
+    let extension = fullName.pop()
+    if (extension === "md" || extension === "markdown") {
+      return "text/plain"
+    }
+    return extension as string
   }
 
   getFileIconType(file: MyFile): string {
@@ -104,9 +112,9 @@ export class FileService {
     return this.http.post(url, formData, {withCredentials: true, reportProgress: true, observe: 'events'});
   }
 
-  downloadFile(fileHash: string, param: string) {
+  downloadFile(fileHash: string, fileName: string) {
     let url = this.host + "/api/v1/files/file/" + fileHash;
-    return this.http.get(url, {withCredentials: true, responseType: "blob", params: {"fileName": param}});
+    return this.http.get(url, {withCredentials: true, responseType: "blob", params: {"fileName": fileName, "action": "download"}});
   }
 
   downloadDir(dirHash: string, param: string) {

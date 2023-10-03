@@ -3,6 +3,7 @@ import {MyFile, TimeShowed} from "../models/file.model";
 import {FileService} from "../services/file.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {saveAs} from "file-saver";
+import {environment} from "../../environments/environment.development";
 
 @Component({
   selector: 'app-file-table',
@@ -10,7 +11,10 @@ import {saveAs} from "file-saver";
   styleUrls: ['./file-table.component.css']
 })
 export class FileTableComponent implements OnInit {
-  TimeShowed = TimeShowed
+  TimeShowed = TimeShowed;
+  previewFilePath = "";
+  previewModelOpen = false;
+  previewFileName = "";
   @Input() timeShowed: TimeShowed = TimeShowed.CREATED;
   @Output() dirEvent = new EventEmitter<MyFile>();
   files: MyFile[] = [];
@@ -80,6 +84,12 @@ export class FileTableComponent implements OnInit {
       // TODO 支持预览
       console.log("预览暂时不支持")
     }
+  }
+
+  previewFile(file: MyFile) {
+    this.previewModelOpen = true;
+    this.previewFileName = file.name
+    this.previewFilePath = `${environment.API_URL}/api/v1/files/file/${file.fileHash}?fileName=${file.name}&action=preview`;
   }
 
   downloadFile(file: MyFile) {

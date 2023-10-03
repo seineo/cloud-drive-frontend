@@ -9,7 +9,7 @@
 
   <clr-dg-row class="data-row" *clrDgItems="let file of files" (dblclick)="onDoubleClick(file)">
     <clr-dg-action-overflow>
-      <button class="action-item">
+      <button class="action-item" (click)="previewFile(file)">
         <cds-icon shape="eye"></cds-icon>
         <span class="file-action-name">预览</span>
       </button>
@@ -46,7 +46,8 @@
       {{ file.name }}
       <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
     </clr-dg-cell>
-    <clr-dg-cell *ngIf="timeShowed === TimeShowed.CREATED"> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
+    <clr-dg-cell
+      *ngIf="timeShowed === TimeShowed.CREATED"> {{file.createdAt | date:'yyyy-MM-dd HH:mm'  }} </clr-dg-cell>
     <clr-dg-cell> {{fileService.humanFileSize(file.size, false, 1)}} </clr-dg-cell>
   </clr-dg-row>
 
@@ -58,3 +59,16 @@
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
+
+
+<clr-modal [(clrModalOpen)]="previewModelOpen" [clrModalSize]="'xl'" >
+  <h3 class="modal-title">{{previewFileName}}</h3>
+  <div class="modal-body">
+    <iframe [src]="previewFilePath | safe" loading="lazy" style="height: 100vh; width: 100%"></iframe>
+  </div>
+  <!--  <div class="modal-footer">-->
+  <!--    <button type="button" class="btn btn-outline" (click)="previewModelOpen = false">Cancel</button>-->
+  <!--    <button type="button" class="btn btn-primary" (click)="previewModelOpen = false">Ok</button>-->
+  <!--  </div>-->
+</clr-modal>
+

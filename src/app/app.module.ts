@@ -28,7 +28,7 @@ import {
 } from '@cds/core/icon';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import {AppComponent, SafePipe} from './app.component';
 import { SiteLayoutComponent } from './site-layout/site-layout.component';
 import { HeaderComponent } from './header/header.component';
 import { LoginComponent } from './login/login.component';
@@ -58,7 +58,8 @@ ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plus
     UploadListComponent,
     TrashComponent,
     FileTableComponent,
-    StarComponent
+    StarComponent,
+    SafePipe
   ],
     imports: [
         BrowserModule,
