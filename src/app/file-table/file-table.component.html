@@ -37,12 +37,11 @@
         <cds-icon *ngSwitchCase="'application/pdf'" shape="pdf-file" solid></cds-icon>
         <cds-icon *ngSwitchCase="'image'" shape="image"></cds-icon>
         <cds-icon *ngSwitchCase="'video'" shape="video-camera"></cds-icon>
+        <cds-icon *ngSwitchCase="'audio'" shape="microphone"></cds-icon>
         <cds-icon *ngSwitchCase="'zip'" shape="file-zip"></cds-icon>
         <cds-icon *ngSwitchCase="'dir'" shape="folder"></cds-icon>
         <cds-icon *ngSwitchDefault shape="file"></cds-icon>
       </ng-container>
-      <!--            <cds-icon shape="file-zip" *ngIf="file.type === 'application/zip'"></cds-icon>-->
-      <!--            <cds-icon shape="file" *ngIf="file.type !== 'dir' &&file.type !== 'application/zip'"></cds-icon>-->
       {{ file.name }}
       <cds-icon shape="star" *ngIf="file.isStarred"></cds-icon>
     </clr-dg-cell>
@@ -61,14 +60,17 @@
 </clr-datagrid>
 
 
-<clr-modal [(clrModalOpen)]="previewModelOpen" [clrModalSize]="'xl'" >
-  <h3 class="modal-title">{{previewFileName}}</h3>
-  <div class="modal-body">
-    <iframe [src]="previewFilePath | safe" loading="lazy" style="height: 100vh; width: 100%"></iframe>
+<clr-modal [(clrModalOpen)]="previewModelOpen" [clrModalSize]="'lg'">
+  <h3 class="modal-title" *ngIf="filePreview">{{filePreview.name}}</h3>
+  <div class="modal-body" *ngIf="filePreview" style="display: block; text-align: center">
+    <iframe *ngIf="filePreview.type.startsWith('text') || filePreview.type === 'application/pdf'"
+            [src]="previewFilePath | safe" loading="lazy" style="height: 80vh; width: 100%"></iframe>
+    <img *ngIf="filePreview.type.startsWith('image')" [src]="previewFilePath | safe"
+         [alt]="filePreview.name" style="height: auto; width: 100%">
+    <video *ngIf="filePreview.type.startsWith('video')" [src]="previewFilePath | safe"
+           controls style="height: auto;width: 100%; object-fit: contain">您的浏览器不支持video</video>
+    <audio *ngIf="filePreview.type.startsWith('audio')" [src]="previewFilePath | safe"
+           controls>您的浏览器不支持audio</audio>
   </div>
-  <!--  <div class="modal-footer">-->
-  <!--    <button type="button" class="btn btn-outline" (click)="previewModelOpen = false">Cancel</button>-->
-  <!--    <button type="button" class="btn btn-primary" (click)="previewModelOpen = false">Ok</button>-->
-  <!--  </div>-->
 </clr-modal>
 

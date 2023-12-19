@@ -27,14 +27,6 @@ export class LoginComponent {
     this.loginService.login(this.email, this.password).subscribe(
       data => {
         console.log("user logged in:", data.email);
-        // set rootHash in local storage
-        if (localStorage.getItem("rootHash") === null) {
-          console.log("there is no rootHash in localStorage");
-          localStorage.setItem("rootHash", data.rootHash);
-        }  else {
-          console.log("get rootHash: ", localStorage.getItem("rootHash"));
-        }
-        this.redirectHome()
       },
       error => {
         this.errorHidden = false;

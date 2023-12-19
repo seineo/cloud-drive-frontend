@@ -1,8 +1,7 @@
 export interface UserSignUpRequest {
-  name: string
   email: string
+  nickname: string
   password: string
-  rootHash: string
 }
 
 export interface UserLoginRequest {
@@ -14,4 +13,8 @@ export interface UserSignResponse {
   email : string
   name: string
   rootHash: string
+}
+
+export interface UserCodeRequest {
+  email: string
 }

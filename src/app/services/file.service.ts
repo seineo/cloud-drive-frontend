@@ -32,18 +32,19 @@ export class FileService {
 
   getFileIconType(file: MyFile): string {
     if (file.type === "application/pdf" || file.type == "dir") {
-      return file.type
+      return file.type;
     } else if (file.type.startsWith("image")) {
-      return "image"
+      return "image";
     } else if (file.type.startsWith("video")) {
       return "video";
+    } else if (file.type.startsWith("audio")) {
+      return "audio";
     } else if (file.type === "application/zip" || file.type === "application/gzip"
       || file.type === "application/x-rar-compressed" || file.type === "application/x-7z-compressed"
       || file.type === "application/x-tar") {
-      return "zip"
-    } else {
-      return "file";
+      return "zip";
     }
+    return file.type;
   }
 
   /**

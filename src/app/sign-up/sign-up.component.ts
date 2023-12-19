@@ -38,7 +38,8 @@ export class SignUpComponent {
       password: this.formBuilder.group({
         password: new FormControl("",
           [Validators.required, Validators.maxLength(20),
-            Validators.pattern("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&.]).{8,}")]),
+            Validators.pattern("^[A-Za-z0-9]{6,38}$")]),
+        // (?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&.]).{8,}
         confirm: ["", Validators.required],
       }),
     });
@@ -53,8 +54,7 @@ export class SignUpComponent {
     console.log("authCode target email:", email)
     this.loginService.sendAuthEmail(email).subscribe(
       data => {
-        console.log("sendCode response:", data)
-        this.emailID = data.emailID
+        console.log("sendCode: :", data)
       },
       error => console.error(error)
     );
@@ -71,10 +71,10 @@ export class SignUpComponent {
     let inputCode = this.form.get("auth.code")?.value;
     let email = this.form.get("info.email")?.value;
 
-    this.loginService.getAuthCode(this.emailID, email).subscribe(
+    this.loginService.getAuthCode(email).subscribe(
       data => {
-        console.log("input: %s code: %s", inputCode, data.code)
-        if (data.code === inputCode) {
+        console.log("input: %s code: %s", inputCode, data)
+        if (data === inputCode) {
           console.log("auth pass");
           this.codeErrorHidden = true;
           this.codeNextButton.navigateToNextPanel();

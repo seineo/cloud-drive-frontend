@@ -14,12 +14,12 @@ export class FileTableComponent implements OnInit {
   TimeShowed = TimeShowed;
   previewFilePath = "";
   previewModelOpen = false;
-  previewFileName = "";
+  filePreview!: MyFile;
   @Input() timeShowed: TimeShowed = TimeShowed.CREATED;
   @Output() dirEvent = new EventEmitter<MyFile>();
   files: MyFile[] = [];
 
-  constructor(public fileService: FileService, private router: Router,  private route: ActivatedRoute) {
+  constructor(public fileService: FileService, private router: Router, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
@@ -87,9 +87,10 @@ export class FileTableComponent implements OnInit {
   }
 
   previewFile(file: MyFile) {
+    this.filePreview = file;
     this.previewModelOpen = true;
-    this.previewFileName = file.name
     this.previewFilePath = `${environment.API_URL}/api/v1/files/file/${file.fileHash}?fileName=${file.name}&action=preview`;
+    console.log("preview file: ", this.filePreview.name);
   }
 
   downloadFile(file: MyFile) {

@@ -21,10 +21,11 @@ import {
   folderIcon,
   fileZipIcon,
   videoCameraIcon,
+  microphoneIcon,
   imageIcon,
   eyeIcon,
   historyIcon,
-  eraserIcon, hardDiskIcon
+  eraserIcon, hardDiskIcon,
 } from '@cds/core/icon';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -46,7 +47,7 @@ import {StarComponent} from "./star/star.component";
 ClarityIcons.addIcons(cogIcon, cloudIcon, clockIcon, pictureIcon, fileIcon, plusCircleIcon,
   shareIcon, starIcon, trashIcon, uploadCloudIcon, downloadCloudIcon, windowCloseIcon,
   successStandardIcon, folderIcon, fileIcon, fileZipIcon, pdfFileIcon, videoCameraIcon, imageIcon,
-  eyeIcon, historyIcon, eraserIcon, hardDiskIcon);
+  eyeIcon, historyIcon, eraserIcon, hardDiskIcon, microphoneIcon);
 @NgModule({
   declarations: [
     AppComponent,
